@@ -9,6 +9,7 @@ import { genericOAuth } from "better-auth/plugins/generic-oauth";
 import { organization } from "better-auth/plugins/organization";
 import { API_KEY_EXPIRATION, API_KEY_HEADER, API_KEY_PREFIX } from "./api-keys";
 import { AUTH_COOKIE_PREFIX } from "./cookies";
+import { demoGuard } from "./demo-guard";
 import { env } from "./env";
 import { ensureWorkspaceMembership } from "./organization";
 import {
@@ -244,6 +245,8 @@ export const auth = betterAuth({
 				minExpiresIn: API_KEY_EXPIRATION.minDays,
 			},
 		}),
+
+		demoGuard(),
 	],
 
 	databaseHooks: {

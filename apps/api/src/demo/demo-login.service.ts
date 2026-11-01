@@ -1,11 +1,11 @@
 import { auth } from "@crm/auth/auth";
+import { demoLoginEmail } from "@crm/auth/demo";
 import { ensureWorkspaceMembership } from "@crm/auth/organization";
-import { isWorkspaceEmail } from "@crm/auth/workspace";
 import type { Db } from "@crm/db";
 import { Injectable, ServiceUnavailableException } from "@nestjs/common";
 import { getCookies } from "better-auth/cookies";
 import { InjectDatabase } from "../database/database.constants";
-import { DEMO_LOGIN, readDemoLoginSettings } from "./demo-config";
+import { DEMO_LOGIN } from "./demo-config";
 
 export type DemoSessionCookie = {
 	name: string;
@@ -20,29 +20,19 @@ export type DemoSessionCookie = {
 	};
 };
 
-export type DemoSessionRequest = {
-	ipAddress: string | undefined;
-	userAgent: string | undefined;
-};
-
 @Injectable()
 export class DemoLoginService {
 	constructor(@InjectDatabase() private readonly db: Db) {}
 
 	demoEmail(): string | undefined {
-		const settings = readDemoLoginSettings();
-		if (!settings.enabled || !settings.email) return undefined;
-		return isWorkspaceEmail(settings.email) ? settings.email : undefined;
+		return demoLoginEmail();
 	}
 
 	isEnabled(): boolean {
 		return this.demoEmail() !== undefined;
 	}
 
-	async mintSession(
-		email: string,
-		request: DemoSessionRequest,
-	): Promise<DemoSessionCookie> {
+	async mintSession(email: string): Promise<DemoSessionCookie> {
 		const user = await this.db.user.upsert({
 			where: { email },
 			create: {
@@ -71,6 +61,8 @@ export class DemoLoginService {
 		const token = randomToken();
 		const expiresAt = new Date(Date.now() + DEMO_LOGIN.session.lifetimeMs);
 
+		// Every visitor shares this user, so nothing that identifies one
+		// visitor is written to the session row.
 		await this.db.session.create({
 			data: {
 				id: token,
@@ -78,8 +70,8 @@ export class DemoLoginService {
 				userId: user.id,
 				expiresAt,
 				activeOrganizationId: workspaceId,
-				ipAddress: request.ipAddress ?? null,
-				userAgent: request.userAgent ?? null,
+				ipAddress: null,
+				userAgent: null,
 				updatedAt: new Date(),
 			},
 		});

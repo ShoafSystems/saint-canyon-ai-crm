@@ -59,10 +59,7 @@ export class DemoController {
 			);
 		}
 
-		const cookie = await this.demo.mintSession(email, {
-			ipAddress: req.ip,
-			userAgent: req.get("user-agent"),
-		});
+		const cookie = await this.demo.mintSession(email);
 
 		this.logger.log({ message: "Demo session minted" });
 

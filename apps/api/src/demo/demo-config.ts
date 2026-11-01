@@ -12,30 +12,3 @@ export const DEMO_LOGIN = {
 	user: { idPrefix: "demo-", idHexLength: 20, name: "Demo" },
 	token: { bytes: 32 },
 } as const;
-
-export type DemoLoginSettings = {
-	enabled: boolean;
-	email: string | undefined;
-};
-
-export function readDemoLoginSettings(
-	source: Record<string, string | undefined> = process.env,
-): DemoLoginSettings {
-	const email = source.DEMO_LOGIN_EMAIL?.trim().toLowerCase();
-	return {
-		enabled: source.DEMO_LOGIN_ENABLED === "true",
-		email: email ? email : undefined,
-	};
-}
-
-export function isDemoUser(
-	email: string | null | undefined,
-	source: Record<string, string | undefined> = process.env,
-): boolean {
-	const settings = readDemoLoginSettings(source);
-	return (
-		settings.enabled &&
-		settings.email !== undefined &&
-		email?.trim().toLowerCase() === settings.email
-	);
-}

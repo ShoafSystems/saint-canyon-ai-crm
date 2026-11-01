@@ -1,3 +1,4 @@
+import { isDemoUser } from "@crm/auth/demo";
 import type { Db } from "@crm/db";
 import {
 	defaultAgentModel,
@@ -13,7 +14,6 @@ import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { ResearchKeyService } from "../agent/research-key.service";
 import { BackfillService } from "../backfill/backfill.service";
 import { InjectDatabase } from "../database/database.constants";
-import { isDemoUser } from "../demo/demo-config";
 import { ModelCatalogService } from "./model-catalog.service";
 import type {
 	AgentModelSettings,

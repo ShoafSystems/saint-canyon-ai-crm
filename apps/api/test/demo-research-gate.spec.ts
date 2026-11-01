@@ -17,7 +17,7 @@ fallback(
 fallback("BETTER_AUTH_SECRET", "test-secret-at-least-32-characters-long");
 fallback("API_URL", "http://localhost:3001");
 
-const { isDemoUser } = await import("../src/demo/demo-config");
+const { isDemoUser } = await import("@crm/auth/demo");
 const { SettingsService } = await import("../src/settings/settings.service");
 
 const DEMO_EMAIL = "demo@demo.example";
