@@ -8,6 +8,8 @@ Usage: python3 deploy/forge/stack.py <command> [...]
   db           start Postgres 17
   migrate      prisma migrate deploy (one-off container)
   seed         load the sample data (one-off container)
+  demo-env     set the demo keys in an existing prod.env (secrets kept)
+  reset-db     stop api/app, recreate the database, migrate, seed
   build-api    bun build -> apps/api/dist (no network)
   build-app    next build on Node 22, detached (no network); poll with `logs`
   api          start the API (bun dist/main.js)
@@ -51,7 +53,23 @@ APP_URL = f"http://127.0.0.1:{APP_PORT}"
 # proxy and SSR tRPC calls. The browser only ever calls its own origin, so
 # this stays the in-pod address whatever the public origin is.
 INTERNAL_API_URL = f"http://127.0.0.1:{API_PORT}"
-ALLOWED_SIGN_IN = "saint-canyon.test"
+
+# Public demo instance (synthetic .test addresses only). The demo user signs
+# in as a member through POST /demo/session; the owner is seeded and never
+# signs in. ALLOWED_SIGN_IN names exactly these two addresses. The agent stays
+# off: no ANTHROPIC_API_KEY here.
+DEMO_LOGIN_EMAIL = "demo@saint-canyon.test"
+DEMO_SEED_OWNER_EMAIL = "owner@saint-canyon.test"
+ALLOWED_SIGN_IN = f"{DEMO_LOGIN_EMAIL},{DEMO_SEED_OWNER_EMAIL}"
+DEMO_ENV = {
+    "DEMO_LOGIN_ENABLED": "true",
+    "DEMO_LOGIN_EMAIL": DEMO_LOGIN_EMAIL,
+    "DEMO_SEED_OWNER_EMAIL": DEMO_SEED_OWNER_EMAIL,
+    "ALLOWED_SIGN_IN": ALLOWED_SIGN_IN,
+    # One proxy hop (Tailscale Funnel) appends to X-Forwarded-For.
+    "TRUST_PROXY_HOPS": "1",
+    "CRM_TELEMETRY_DISABLED": "1",
+}
 
 TELEMETRY_OFF = [
     "-e", "CRM_TELEMETRY_DISABLED=1",
@@ -88,6 +106,7 @@ def cmd_secrets():
     os.chmod(PRIV, 0o700)
     if os.path.exists(APP_ENV) and os.path.exists(PG_ENV):
         print("private env files exist; reusing")
+        cmd_demo_env()
         return
     pg_password = secrets.token_hex(24)
     write_private(PG_ENV, [
@@ -101,14 +120,22 @@ def cmd_secrets():
         f"BETTER_AUTH_SECRET={base64.b64encode(secrets.token_bytes(32)).decode()}",
         f"CRON_SECRET={secrets.token_hex(32)}",
         f"AGENT_BRIDGE_SECRET={base64.b64encode(secrets.token_bytes(32)).decode()}",
-        f"ALLOWED_SIGN_IN={ALLOWED_SIGN_IN}",
         f"API_URL={API_URL}",
         f"APP_URL={APP_URL}",
-        "CRM_TELEMETRY_DISABLED=1",
         "DO_NOT_TRACK=1",
         "NEXT_TELEMETRY_DISABLED=1",
+        *(f"{k}={v}" for k, v in DEMO_ENV.items()),
     ])
     print("generated private env files (values not printed)")
+
+
+def cmd_demo_env():
+    """Set the demo keys in an existing prod.env, keeping its secrets."""
+    with open(APP_ENV) as f:
+        lines = f.read().splitlines()
+    kept = [l for l in lines if l.split("=", 1)[0] not in DEMO_ENV]
+    write_private(APP_ENV, kept + [f"{k}={v}" for k, v in DEMO_ENV.items()])
+    print("prod.env demo keys set:", ", ".join(DEMO_ENV))
 
 
 def cmd_pod():
@@ -175,6 +202,18 @@ def cmd_seed():
     # The seed resolves favicons over the network; with DNS blackholed those
     # lookups fail fast and companies keep initials.
     oneoff("compai-prod-seed", BUN_IMAGE, "packages/db", "bun prisma/seed.ts")
+
+
+def cmd_reset_db():
+    # Synthetic data only: stop the API and app, recreate the database, then
+    # migrate and seed. prod.env carries DEMO_SEED_OWNER_EMAIL, so the seed
+    # adds the demo owner and hands the demo user its share of deals.
+    for name in (APP, API):
+        sh(["podman", "stop", "-t", "10", name])
+    sh(["podman", "exec", DB, "dropdb", "-U", "postgres", "--if-exists", "--force", "crm"])
+    sh(["podman", "exec", DB, "createdb", "-U", "postgres", "crm"])
+    cmd_migrate()
+    cmd_seed()
 
 
 def cmd_build_api():
@@ -251,7 +290,7 @@ def cmd_down():
 
 COMMANDS = {
     "secrets": cmd_secrets, "pod": cmd_pod, "db": cmd_db, "migrate": cmd_migrate,
-    "seed": cmd_seed, "build-api": cmd_build_api, "build-app": cmd_build_app,
+    "seed": cmd_seed, "demo-env": cmd_demo_env, "reset-db": cmd_reset_db, "build-api": cmd_build_api, "build-app": cmd_build_app,
     "api": cmd_api, "app": cmd_app, "up": cmd_up, "status": cmd_status,
     "down": cmd_down,
 }
