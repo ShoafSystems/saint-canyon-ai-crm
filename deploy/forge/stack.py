@@ -42,11 +42,15 @@ DB, API, APP = "compai-prod-db", "compai-prod-api", "compai-prod-app"
 VOLUME = "compai-prod-pgdata"
 DB_PORT, API_PORT, APP_PORT = 55433, 3101, 3100
 
-# Loopback for this slice. The public origin (one host, path-routed) is
-# documented in README.md; switching to it means a rebuild of the app,
-# because Next inlines API_URL at build time.
+# Loopback for this slice. API_URL/APP_URL in prod.env are the origins the
+# browser sees (Better Auth's baseURL, OAuth callbacks, trusted origins); the
+# public cutover changes them there and restarts the API (README.md).
 API_URL = f"http://127.0.0.1:{API_PORT}"
 APP_URL = f"http://127.0.0.1:{APP_PORT}"
+# Next inlines API_URL at build time as the server-side target of its /api/*
+# proxy and SSR tRPC calls. The browser only ever calls its own origin, so
+# this stays the in-pod address whatever the public origin is.
+INTERNAL_API_URL = f"http://127.0.0.1:{API_PORT}"
 ALLOWED_SIGN_IN = "saint-canyon.test"
 
 TELEMETRY_OFF = [
@@ -184,7 +188,8 @@ def cmd_build_app():
     # --cpuset-cpus: rootless podman here has no cpuset controller.)
     oneoff("compai-prod-build-app", NODE_IMAGE, "apps/app",
            "exec taskset -c 0-3 ./node_modules/.bin/next build", network="none", detach=True,
-           limits=["--cpus", "4", "--memory", "6g", "--pids-limit", "4096"])
+           limits=["--cpus", "4", "--memory", "6g", "--pids-limit", "4096",
+                   "-e", f"API_URL={INTERNAL_API_URL}"])
     print("detached; poll: python3 deploy/forge/stack.py logs compai-prod-build-app")
 
 
