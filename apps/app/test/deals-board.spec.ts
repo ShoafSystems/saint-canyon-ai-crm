@@ -3,6 +3,34 @@ import {
 	adjacentStage,
 	groupByStage,
 } from "../app/(app)/[slug]/deals/deals-board-model";
+import {
+	boardListInput,
+	DEALS_BOARD,
+	loadDealsLayout,
+} from "../app/(app)/[slug]/deals/deals-layout";
+import { dealsSearchParams } from "../app/(app)/[slug]/deals/deals-search-params";
+import { SEARCH_PARAM } from "../lib/search-param-keys";
+
+describe("board prefetch", () => {
+	it("reads the layout from the URL, defaulting to the table", () => {
+		const key = SEARCH_PARAM.deals.layout;
+
+		expect(loadDealsLayout(`?${key}=board`)[key]).toBe("board");
+		expect(loadDealsLayout("")[key]).toBe("table");
+		expect(loadDealsLayout(`?${key}=kanban`)[key]).toBe("table");
+	});
+
+	it("asks for the first page up to the board cap, keeping the filters", () => {
+		const input = { ...dealsSearchParams.defaultInput(), page: 3, q: "acme" };
+
+		expect(boardListInput(input)).toEqual({
+			...input,
+			page: 1,
+			pageSize: DEALS_BOARD.pageSize,
+		});
+		expect(DEALS_BOARD.pageSize).toBe(100);
+	});
+});
 
 const STAGES = ["DEMO_BOOKED", "CONTRACT_SENT", "CLOSED_WON"] as const;
 

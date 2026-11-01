@@ -31,7 +31,7 @@ import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
 import { adjacentStage, groupByStage } from "./deals-board-model";
-import { DEALS_BOARD } from "./deals-layout";
+import { boardListInput } from "./deals-layout";
 import { dealsSearchParams } from "./deals-search-params";
 
 type DealRow = RouterOutputs["deals"]["list"]["rows"][number];
@@ -72,11 +72,7 @@ export function DealsBoard() {
 	const { move, pending } = useMoveDeal();
 
 	const deals = useQuery({
-		...trpc.deals.list.queryOptions({
-			...input,
-			page: 1,
-			pageSize: DEALS_BOARD.pageSize,
-		}),
+		...trpc.deals.list.queryOptions(boardListInput(input)),
 		placeholderData: (previous) => previous,
 	});
 

@@ -10,10 +10,12 @@ import {
 	PageShellLoading,
 	PageShellTitle,
 } from "@/components/page-shell";
+import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { requireSession } from "@/lib/session";
 import { HydrateClient } from "@/lib/trpc/hydrate";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
 import { CreateDealSheet } from "./create-deal-sheet";
+import { boardListInput, loadDealsLayout } from "./deals-layout";
 import { DealsLayoutToggle } from "./deals-layout-toggle";
 import { dealsSearchParams } from "./deals-search-params";
 import { DealsView } from "./deals-view";
@@ -52,16 +54,20 @@ export default function DealsPage({
 async function Deals({
 	searchParams,
 }: Pick<PageProps<"/[slug]/deals">, "searchParams">) {
-	const [, values] = await Promise.all([
+	const [, values, layout] = await Promise.all([
 		requireSession(),
 		dealsSearchParams.load(searchParams),
+		loadDealsLayout(searchParams),
 	]);
+
+	const input = dealsSearchParams.toInput(values);
+	const board = layout[SEARCH_PARAM.deals.layout] === "board";
 
 	const trpc = getServerTrpc();
 	const queryClient = getServerQueryClient();
 	await Promise.all([
 		queryClient.prefetchQuery(
-			trpc.deals.list.queryOptions(dealsSearchParams.toInput(values)),
+			trpc.deals.list.queryOptions(board ? boardListInput(input) : input),
 		),
 		queryClient.prefetchQuery(trpc.users.list.queryOptions()),
 		queryClient.prefetchQuery(trpc.companies.options.queryOptions({ q: "" })),
