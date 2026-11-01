@@ -13,6 +13,7 @@ import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { ResearchKeyService } from "../agent/research-key.service";
 import { BackfillService } from "../backfill/backfill.service";
 import { InjectDatabase } from "../database/database.constants";
+import { isDemoUser } from "../demo/demo-config";
 import { ModelCatalogService } from "./model-catalog.service";
 import type {
 	AgentModelSettings,
@@ -85,10 +86,18 @@ export class SettingsService {
 		return { models: models ?? [], available: models !== null };
 	}
 
-	async researchKey(): Promise<ResearchKeySettings> {
+	/**
+	 * The demo user skips the research-key gate, but `configured` stays honest
+	 * so Settings never shows a key as connected when there is none.
+	 */
+	async researchKey(viewerEmail?: string): Promise<ResearchKeySettings> {
 		const key = await readContextDevKey(this.db);
 
-		return { configured: key !== null, hint: key ? maskKey(key) : null };
+		return {
+			configured: key !== null,
+			hint: key ? maskKey(key) : null,
+			waived: key === null && isDemoUser(viewerEmail),
+		};
 	}
 
 	async setResearchKey(apiKey: string): Promise<ResearchKeySettings> {

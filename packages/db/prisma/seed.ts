@@ -11,6 +11,7 @@ import {
 	RateSource,
 } from "../src/generated/prisma/enums";
 import { readReportingCurrency, SETTINGS_ID } from "../src/settings";
+import { seedDemo } from "./seed-demo";
 
 function makeRandom(seed: number): () => number {
 	let a = seed;
@@ -1000,6 +1001,7 @@ async function main() {
 	const activities = await seedActivities(companies, contacts, deals, ownerIds);
 	const companyFields = await seedCompanyFields();
 	await seedCompanyFieldValues(companyFields, companies, ownerIds);
+	await seedDemo(db);
 
 	console.log(
 		`Seeded ${companies.length} companies, ${contacts.length} contacts, ` +

@@ -27,3 +27,15 @@ export function readDemoLoginSettings(
 		email: email ? email : undefined,
 	};
 }
+
+export function isDemoUser(
+	email: string | null | undefined,
+	source: Record<string, string | undefined> = process.env,
+): boolean {
+	const settings = readDemoLoginSettings(source);
+	return (
+		settings.enabled &&
+		settings.email !== undefined &&
+		email?.trim().toLowerCase() === settings.email
+	);
+}

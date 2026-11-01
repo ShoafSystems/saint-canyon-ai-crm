@@ -16,6 +16,7 @@ import {
 	generateOpenApiDocument,
 } from "trpc-to-openapi";
 import { AppModule } from "./app.module";
+import { applyTrustProxy } from "./config/trust-proxy";
 import { ContextLogger } from "./logging/context-logger";
 import { REST_BRIDGE_PATH } from "./trpc/openapi";
 import { createBaseTrpcContext } from "./trpc/trpc.context";
@@ -27,6 +28,7 @@ export async function createApp(): Promise<NestExpressApplication> {
 		{ bodyParser: false, logger: new ContextLogger() },
 	);
 
+	applyTrustProxy(app);
 	app.use(helmet());
 	app.useGlobalPipes(
 		new ValidationPipe({

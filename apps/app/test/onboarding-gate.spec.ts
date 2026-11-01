@@ -144,6 +144,15 @@ describe("readResearchGate", () => {
 		);
 	});
 
+	it("is settled for a waived viewer without claiming a key", async () => {
+		answerWith({
+			result: { data: { configured: false, hint: null, waived: true } },
+		});
+		expect(await readResearchGate(request("/", [SESSION_COOKIE]))).toBe(
+			"settled",
+		);
+	});
+
 	it("is unknown rather than required when the API cannot be read", async () => {
 		stub(async () => {
 			throw new Error("connect ECONNREFUSED");

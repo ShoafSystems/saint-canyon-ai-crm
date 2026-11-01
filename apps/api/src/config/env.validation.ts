@@ -11,6 +11,7 @@ import {
 	MinLength,
 	validateSync,
 } from "class-validator";
+import { MAX_TRUSTED_PROXY_HOPS } from "./trust-proxy";
 
 export enum NodeEnv {
 	Development = "development",
@@ -150,6 +151,13 @@ export class EnvironmentVariables {
 	@IsOptional()
 	@IsString()
 	DEMO_LOGIN_EMAIL?: string;
+
+	@IsOptional()
+	@Type(() => Number)
+	@IsInt()
+	@Min(0)
+	@Max(MAX_TRUSTED_PROXY_HOPS)
+	TRUST_PROXY_HOPS?: number;
 }
 
 export type RawEnvironment = Record<string, string | undefined>;

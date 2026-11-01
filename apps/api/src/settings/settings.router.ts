@@ -1,6 +1,14 @@
 import { Inject } from "@nestjs/common";
-import { Input, Mutation, Query, Router, UseMiddlewares } from "nestjs-trpc";
+import {
+	Ctx,
+	Input,
+	Mutation,
+	Query,
+	Router,
+	UseMiddlewares,
+} from "nestjs-trpc";
 import type { z } from "zod";
+import type { AuthedTrpcContext } from "../trpc/context.types";
 import { AuthMiddleware } from "../trpc/middlewares/auth.middleware";
 import { restMeta } from "../trpc/openapi";
 import {
@@ -50,8 +58,8 @@ export class SettingsRouter {
 		output: researchKeyOutput,
 		meta: restMeta("GET", "/settings/research-key", ["Settings"]),
 	})
-	async researchKey() {
-		return this.settings.researchKey();
+	async researchKey(@Ctx() ctx: AuthedTrpcContext) {
+		return this.settings.researchKey(ctx.user.email);
 	}
 
 	@Mutation({
