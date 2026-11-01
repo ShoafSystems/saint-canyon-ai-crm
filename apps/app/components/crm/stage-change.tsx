@@ -32,12 +32,12 @@ import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 import { DealStageIndicator } from "./deal-stage";
 
-const closeReasonParams = {
+export const closeReasonParams = {
 	[SEARCH_PARAM.dialog.closeDeal]: parseAsString,
 	[SEARCH_PARAM.dialog.closeStage]: parseAsString,
 };
 
-function useStageMutation(onDone?: () => void) {
+export function useStageMutation(onDone?: () => void) {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 
