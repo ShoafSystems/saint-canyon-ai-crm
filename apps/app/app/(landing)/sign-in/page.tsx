@@ -3,8 +3,10 @@ import type { Metadata } from "next";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { Suspense } from "react";
 import { AuthHeading, AuthShell } from "@/components/auth-shell";
+import { DEMO_SIGN_IN_URL, isDemoSignInEnabled } from "@/lib/demo";
 import { getSession } from "@/lib/session";
 import { getServerQueryClient, getServerTrpc } from "@/lib/trpc/server";
+import { DemoSignIn } from "./demo-sign-in";
 import { SocialSignIn } from "./social-sign-in";
 import { type SsoProvider, SsoSignIn } from "./sso-sign-in";
 
@@ -60,10 +62,11 @@ export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
 async function SignIn({
 	searchParams,
 }: Pick<PageProps<"/sign-in">, "searchParams">) {
-	const [session, options, { method }] = await Promise.all([
+	const [session, options, { method }, demo] = await Promise.all([
 		currentSession(),
 		signInOptions(),
 		searchParams,
+		isDemoSignInEnabled(),
 	]);
 
 	if (session) {
@@ -85,7 +88,7 @@ async function SignIn({
 				? configured
 				: [];
 
-	if (!showSso && social.length === 0) {
+	if (!showSso && social.length === 0 && !demo) {
 		return (
 			<>
 				<AuthHeading
@@ -110,6 +113,7 @@ async function SignIn({
 				description="Sign in with your account to continue."
 			/>
 
+			{demo ? <DemoSignIn action={DEMO_SIGN_IN_URL} /> : null}
 			{showSso ? <SsoSignIn providers={providers} /> : null}
 			{social.map((provider) => (
 				<SocialSignIn key={provider} provider={provider} />

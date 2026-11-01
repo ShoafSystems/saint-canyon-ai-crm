@@ -18,6 +18,7 @@ import { CurrencyModule } from "./currency/currency.module";
 import { DashboardModule } from "./dashboard/dashboard.module";
 import { DatabaseModule } from "./database/database.module";
 import { DealsModule } from "./deals/deals.module";
+import { DemoModule } from "./demo/demo.module";
 import { EnrichmentModule } from "./enrichment/enrichment.module";
 import { FieldsModule } from "./fields/fields.module";
 import { GoogleModule } from "./google/google.module";
@@ -81,6 +82,7 @@ import { WorkspaceModule } from "./workspace/workspace.module";
 		TrackingModule,
 		ArchiveModule,
 		SavedViewsModule,
+		DemoModule,
 	],
 })
 export class AppModule {}

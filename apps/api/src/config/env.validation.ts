@@ -142,6 +142,14 @@ export class EnvironmentVariables {
 	@IsOptional()
 	@IsString()
 	CRM_TELEMETRY_DISABLED?: string;
+
+	@IsOptional()
+	@IsString()
+	DEMO_LOGIN_ENABLED?: string;
+
+	@IsOptional()
+	@IsString()
+	DEMO_LOGIN_EMAIL?: string;
 }
 
 export type RawEnvironment = Record<string, string | undefined>;
