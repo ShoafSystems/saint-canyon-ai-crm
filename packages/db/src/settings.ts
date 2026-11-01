@@ -12,6 +12,44 @@ export const DEFAULT_AGENT_MODEL = {
 	contextWindowTokens: 1_000_000,
 } as const;
 
+/**
+ * Used when ANTHROPIC_API_KEY is set and nobody has chosen a model. Ids keep
+ * the gateway's `anthropic/` prefix so a stored choice reads the same either
+ * way; ANTHROPIC_MODEL overrides it.
+ */
+export const DEFAULT_ANTHROPIC_MODEL = {
+	id: "anthropic/claude-sonnet-5-5",
+	contextWindowTokens: 200_000,
+} as const;
+
+export function anthropicConfigured(env = process.env): boolean {
+	return Boolean(env.ANTHROPIC_API_KEY?.trim());
+}
+
+export function gatewayConfigured(env = process.env): boolean {
+	return Boolean(
+		env.AI_GATEWAY_API_KEY?.trim() || env.VERCEL_OIDC_TOKEN?.trim(),
+	);
+}
+
+export function defaultAgentModel(env = process.env): {
+	id: string;
+	contextWindowTokens: number;
+} {
+	if (!anthropicConfigured(env)) return DEFAULT_AGENT_MODEL;
+
+	const override = env.ANTHROPIC_MODEL?.trim();
+
+	return override
+		? {
+				id: override.startsWith("anthropic/")
+					? override
+					: `anthropic/${override}`,
+				contextWindowTokens: DEFAULT_ANTHROPIC_MODEL.contextWindowTokens,
+			}
+		: DEFAULT_ANTHROPIC_MODEL;
+}
+
 export interface AgentModelSetting {
 	id: string;
 	contextWindowTokens: number;
@@ -24,14 +62,16 @@ export async function readAgentModel(db: Db): Promise<AgentModelSetting> {
 		select: { agentModelId: true, agentModelContextWindow: true },
 	});
 
+	const fallback = defaultAgentModel();
+
 	if (!row?.agentModelId) {
-		return { ...DEFAULT_AGENT_MODEL, isDefault: true };
+		return { ...fallback, isDefault: true };
 	}
 
 	return {
 		id: row.agentModelId,
 		contextWindowTokens:
-			row.agentModelContextWindow ?? DEFAULT_AGENT_MODEL.contextWindowTokens,
+			row.agentModelContextWindow ?? fallback.contextWindowTokens,
 		isDefault: false,
 	};
 }

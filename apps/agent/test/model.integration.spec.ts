@@ -27,14 +27,26 @@ async function clear() {
  */
 let saved: Prisma.AppSettingUncheckedCreateInput | null = null;
 
+// These cases read the gateway path; provider selection has its own spec.
+const env = {
+	ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
+	AI_GATEWAY_API_KEY: process.env.AI_GATEWAY_API_KEY,
+};
+
 beforeAll(async () => {
 	saved = await db.appSetting.findUnique({ where: { id: SETTINGS_ID } });
+	delete process.env.ANTHROPIC_API_KEY;
+	process.env.AI_GATEWAY_API_KEY = "test-gateway";
 });
 
 beforeEach(clear);
 afterEach(clear);
 
 afterAll(async () => {
+	for (const [key, value] of Object.entries(env)) {
+		if (value === undefined) delete process.env[key];
+		else process.env[key] = value;
+	}
 	if (saved) await db.appSetting.create({ data: saved });
 });
 

@@ -1,6 +1,6 @@
 import type { Db } from "@crm/db";
 import {
-	DEFAULT_AGENT_MODEL,
+	defaultAgentModel,
 	maskKey,
 	readAgentModel,
 	readArchiveRetentionDays,
@@ -41,7 +41,7 @@ export class SettingsService {
 		return {
 			selectedId: model.isDefault ? null : model.id,
 			effectiveId: model.id,
-			defaultId: DEFAULT_AGENT_MODEL.id,
+			defaultId: defaultAgentModel().id,
 			effective: await this.catalog.find(model.id),
 			updatedAt: row?.updatedAt.toISOString() ?? null,
 		};
@@ -58,7 +58,7 @@ export class SettingsService {
 
 		if (!models) {
 			throw new BadRequestException(
-				"Could not reach the AI Gateway to check that model. Try again in a moment.",
+				"Could not reach the model catalog to check that model. Try again in a moment.",
 			);
 		}
 
@@ -66,7 +66,7 @@ export class SettingsService {
 
 		if (!chosen) {
 			throw new BadRequestException(
-				`The AI Gateway does not serve a tool-using model called "${modelId}".`,
+				`No configured provider serves a tool-using model called "${modelId}".`,
 			);
 		}
 

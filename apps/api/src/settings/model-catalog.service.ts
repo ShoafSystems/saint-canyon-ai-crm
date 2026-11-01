@@ -1,3 +1,4 @@
+import { anthropicConfigured, gatewayConfigured } from "@crm/db/settings";
 import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import type { Cache } from "cache-manager";
@@ -45,6 +46,34 @@ const gatewayCatalog = z
 	.object({ data: z.array(z.json()).catch([]) })
 	.catch({ data: [] });
 
+/**
+ * Offered when ANTHROPIC_API_KEY is set. The agent calls these directly, so
+ * the ids drop the gateway's dotted versions for the Anthropic API's dashes.
+ */
+export const CLAUDE_MODELS: readonly CatalogModel[] = [
+	{
+		id: "anthropic/claude-opus-5-5",
+		name: "Claude Opus 5.5",
+		provider: "anthropic",
+		contextWindowTokens: 200_000,
+		pricing: null,
+	},
+	{
+		id: "anthropic/claude-sonnet-5-5",
+		name: "Claude Sonnet 5.5",
+		provider: "anthropic",
+		contextWindowTokens: 200_000,
+		pricing: null,
+	},
+	{
+		id: "anthropic/claude-haiku-5-5",
+		name: "Claude Haiku 5.5",
+		provider: "anthropic",
+		contextWindowTokens: 200_000,
+		pricing: null,
+	},
+];
+
 function usable(model: GatewayModel): boolean {
 	return model.type === "language" && model.tags.includes("tool-use");
 }
@@ -68,7 +97,25 @@ export class ModelCatalogService {
 
 	constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {}
 
+	/**
+	 * With Anthropic configured, Claude comes from Anthropic and the gateway
+	 * only adds the other providers — and only when it has credentials, since
+	 * the agent could not run what it lists otherwise.
+	 */
 	async models(): Promise<CatalogModel[] | null> {
+		if (!anthropicConfigured()) return this.gatewayModels();
+
+		if (!gatewayConfigured()) return [...CLAUDE_MODELS];
+
+		const others = (await this.gatewayModels()) ?? [];
+
+		return [
+			...CLAUDE_MODELS,
+			...others.filter((model) => !model.id.startsWith("anthropic/")),
+		];
+	}
+
+	private async gatewayModels(): Promise<CatalogModel[] | null> {
 		const cached = await this.cache.get<CatalogModel[]>(CATALOG_KEY);
 		if (cached) return cached;
 

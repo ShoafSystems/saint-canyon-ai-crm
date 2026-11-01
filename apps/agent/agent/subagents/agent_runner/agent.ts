@@ -1,6 +1,7 @@
 import { db } from "@crm/db";
-import { DEFAULT_AGENT_MODEL } from "@crm/db/settings";
+import { defaultAgentModel } from "@crm/db/settings";
 import { defineAgent, defineDynamic } from "eve";
+import { resolveModel } from "../../lib/model";
 import { attribute, purposeOf } from "../../lib/session-purpose";
 
 export default defineAgent({
@@ -10,17 +11,11 @@ export default defineAgent({
 		events: {
 			"session.started": async (_event, ctx) => {
 				if (purposeOf(ctx) !== "team-agent") {
-					return {
-						model: DEFAULT_AGENT_MODEL.id,
-						modelContextWindowTokens: DEFAULT_AGENT_MODEL.contextWindowTokens,
-					};
+					return resolveModel(defaultAgentModel());
 				}
 				const runId = attribute(ctx, "runId");
 				if (!runId) {
-					return {
-						model: DEFAULT_AGENT_MODEL.id,
-						modelContextWindowTokens: DEFAULT_AGENT_MODEL.contextWindowTokens,
-					};
+					return resolveModel(defaultAgentModel());
 				}
 
 				const run = await db.agentRun.findUnique({
@@ -31,15 +26,14 @@ export default defineAgent({
 						},
 					},
 				});
-				return run
-					? {
-							model: run.version.modelId,
-							modelContextWindowTokens: run.version.modelContextWindowTokens,
-						}
-					: {
-							model: DEFAULT_AGENT_MODEL.id,
-							modelContextWindowTokens: DEFAULT_AGENT_MODEL.contextWindowTokens,
-						};
+				return resolveModel(
+					run
+						? {
+								id: run.version.modelId,
+								contextWindowTokens: run.version.modelContextWindowTokens,
+							}
+						: defaultAgentModel(),
+				);
 			},
 		},
 	}),
