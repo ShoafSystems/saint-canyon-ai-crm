@@ -199,6 +199,23 @@ describe("retireExhausted", () => {
 		});
 		expect(open).toBe(0);
 	});
+
+	it("retires exactly the limit and leaves the rest for the next pass", async () => {
+		const mine: string[] = [];
+		for (let row = 0; row < 3; row++) mine.push((await queue()).id);
+
+		for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+			const claimed = await claimDue(10, TEST_TASKS);
+			for (const task of claimed) await expire(task.id);
+		}
+
+		expect(await retireExhausted(1)).toHaveLength(1);
+
+		const open = await db.agentTask.count({
+			where: { id: { in: mine }, finishedAt: null },
+		});
+		expect(open).toBe(2);
+	});
 });
 
 describe("completeTask", () => {
