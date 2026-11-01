@@ -3,20 +3,24 @@ import { Toaster } from "@crm/ui/components/sonner";
 import { TooltipProvider } from "@crm/ui/components/tooltip";
 import { cn } from "@crm/ui/lib/utils";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { LocalDateTimeHydrator } from "@/components/local-date-time";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TRPCReactProvider } from "@/lib/trpc/client";
 
-const fontSans = Geist({
+// Self-hosted Geist (geist@1.9.0, SIL OFL; see ./fonts/LICENSE.txt) so builds
+// and self-hosted deploys never fetch from Google Fonts.
+const fontSans = localFont({
+	src: "./fonts/Geist-Variable.woff2",
 	variable: "--font-geist-sans",
-	subsets: ["latin"],
+	weight: "100 900",
 });
 
-const fontMono = Geist_Mono({
+const fontMono = localFont({
+	src: "./fonts/GeistMono-Variable.woff2",
 	variable: "--font-geist-mono",
-	subsets: ["latin"],
+	weight: "100 900",
 });
 
 export const metadata: Metadata = {
