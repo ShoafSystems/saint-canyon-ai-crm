@@ -10,18 +10,20 @@ export function AuthShell({ children }: { children: ReactNode }) {
 			data-slot="auth-shell"
 			className="dark flex min-h-svh flex-col bg-background text-foreground"
 		>
-			<header className="hidden p-8 lg:flex xl:px-12">
-				<Link href="/" aria-label="Homepage" className="flex">
-					<Logo className="size-5 shrink-0" />
-				</Link>
-			</header>
+			{/* Matches the footer's height, so the row below sits in the middle. */}
+			<div aria-hidden className="hidden h-21 lg:block" />
 
 			{/* Hero and card share one centred row, so neither floats off to an edge. */}
 			<div className="mx-auto grid w-full max-w-[1040px] flex-1 items-center gap-16 px-4 py-8 sm:px-10 lg:grid-cols-[minmax(0,1fr)_440px] lg:py-0">
-				<section className="hidden flex-col gap-5 lg:flex">
-					<p className="font-medium text-sm/5 text-muted-foreground tracking-wide">
+				<section className="hidden flex-col gap-6 lg:flex">
+					<Link
+						href="/"
+						aria-label="Homepage"
+						className="flex w-fit items-center gap-3 font-medium text-muted-foreground text-sm/5 tracking-wide"
+					>
+						<Logo className="size-6 shrink-0 text-foreground" />
 						CRM
-					</p>
+					</Link>
 					<h1 className="max-w-[12ch] font-(family-name:--font-display) font-semibold text-6xl/[1.02] tracking-[-0.035em] text-balance xl:text-7xl/[1]">
 						Every customer, one place.
 					</h1>
@@ -63,7 +65,7 @@ export function AuthHeading({
 }) {
 	return (
 		<div className="flex flex-col gap-3 text-left">
-			{/* The wide layout already shows the logo above the hero. */}
+			{/* The wide layout shows the logo in the hero instead. */}
 			<Link href="/" aria-label="Homepage" className="flex lg:hidden">
 				<Logo className="size-6 shrink-0" />
 			</Link>

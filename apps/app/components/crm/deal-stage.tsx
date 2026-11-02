@@ -1,7 +1,13 @@
 import type { DealStage } from "@crm/db/enums";
 import { StatusIndicator } from "@crm/ui/components/status-indicator";
-import { dealStagePresentation } from "@/lib/deal-stage";
+import {
+	dealStageColor,
+	dealStagePresentation,
+	isClosedStage,
+} from "@/lib/deal-stage";
 
+// Open stages take their chart colour, so the dot matches the donut, the
+// board and the value bars; closed stages keep their outcome tone.
 export function DealStageIndicator({
 	stage,
 	className,
@@ -10,5 +16,12 @@ export function DealStageIndicator({
 	className?: string;
 }) {
 	const { label, tone } = dealStagePresentation(stage);
-	return <StatusIndicator tone={tone} label={label} className={className} />;
+	return (
+		<StatusIndicator
+			tone={tone}
+			color={isClosedStage(stage) ? undefined : dealStageColor(stage)}
+			label={label}
+			className={className}
+		/>
+	);
 }

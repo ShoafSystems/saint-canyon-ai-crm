@@ -25,8 +25,8 @@ import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 
 type Summary = RouterOutputs["dashboard"]["summary"];
 
-// Teal and white, so neither series reads as the lime brand accent. Closed
-// won is dashed and drawn last so the pipeline fill never hides it.
+// Slate and white, so neither series borrows a stage colour. Closed won is
+// dashed and drawn last so the pipeline fill never hides it.
 const TREND_CONFIG: ChartConfig = {
 	created: { label: "New pipeline", color: "var(--chart-5)" },
 	won: { label: "Closed won", color: "var(--foreground)" },
