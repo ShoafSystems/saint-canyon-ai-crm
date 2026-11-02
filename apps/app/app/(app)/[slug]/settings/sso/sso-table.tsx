@@ -19,6 +19,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ListSearch } from "@/components/data-table/list-search";
 import { useTableQuery } from "@/components/data-table/use-table-query";
+import { useIsDemoUser } from "@/components/demo-gate";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
@@ -129,6 +130,7 @@ export function SsoTable() {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const { query, input } = useTableQuery(ssoSearchParams);
+	const demo = useIsDemoUser();
 
 	const settings = useQuery(trpc.sso.settings.queryOptions());
 	const providers = useQuery({
@@ -153,7 +155,7 @@ export function SsoTable() {
 			columns={columns(
 				settings.data?.canConfigure ?? false,
 				(provider) => remove.mutate({ providerId: provider.providerId }),
-				remove.isPending,
+				remove.isPending || demo,
 			)}
 			rows={providers.data?.rows ?? []}
 			total={providers.data?.total ?? 0}

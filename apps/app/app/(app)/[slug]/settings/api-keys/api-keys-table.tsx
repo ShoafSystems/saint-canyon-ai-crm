@@ -20,6 +20,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ListSearch } from "@/components/data-table/list-search";
 import { useTableQuery } from "@/components/data-table/use-table-query";
+import { useIsDemoUser } from "@/components/demo-gate";
 import { LocalRelativeTime } from "@/components/local-date-time";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -157,6 +158,7 @@ export function ApiKeysTable() {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const { query, input } = useTableQuery(apiKeysSearchParams);
+	const demo = useIsDemoUser();
 
 	const apiKeys = useQuery({
 		...trpc.apiKeys.list.queryOptions(input),
@@ -182,7 +184,7 @@ export function ApiKeysTable() {
 			search={<ListSearch placeholder="Search by name…" />}
 			columns={columns(
 				(apiKey) => revoke.mutate({ id: apiKey.id }),
-				revoke.isPending,
+				revoke.isPending || demo,
 			)}
 			rows={apiKeys.data?.rows ?? []}
 			total={apiKeys.data?.total ?? 0}

@@ -1,5 +1,6 @@
 import { Spinner } from "@crm/ui/components/spinner";
 import { cn } from "@crm/ui/lib/utils";
+import { DemoGate } from "@/components/demo-gate";
 
 export function ConnectionPage({
 	centered = false,
@@ -12,15 +13,23 @@ export function ConnectionPage({
 }) {
 	return (
 		<main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-(--spacing-page-inline) pt-(--spacing-page-top) pb-(--spacing-page-bottom)">
-			<div
+			<DemoGate
+				noteFirst
 				className={cn(
-					"mx-auto flex w-full max-w-(--container-page) flex-col gap-(--spacing-page-gap)",
-					centered && "flex-1 justify-center",
-					className,
+					"mx-auto w-full max-w-(--container-page) flex-col items-stretch",
+					centered && "flex-1",
 				)}
 			>
-				{children}
-			</div>
+				<div
+					className={cn(
+						"mx-auto flex w-full max-w-(--container-page) flex-col gap-(--spacing-page-gap)",
+						centered && "flex-1 justify-center",
+						className,
+					)}
+				>
+					{children}
+				</div>
+			</DemoGate>
 		</main>
 	);
 }

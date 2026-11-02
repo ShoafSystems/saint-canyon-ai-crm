@@ -241,6 +241,14 @@ describe("what the demo user can still do", () => {
 		await trpcQuery(demo, "settings.agentModel").expect(200);
 	});
 
+	it("is told it is the demo user, and a member is not", async () => {
+		const asDemo = await trpcQuery(demo, "users.me").expect(200);
+		expect(asDemo.body.result.data.demo).toBe(true);
+
+		const asMember = await trpcQuery(member, "users.me").expect(200);
+		expect(asMember.body.result.data.demo).toBe(false);
+	});
+
 	it("writes to the CRM without queueing any agent work", async () => {
 		const tasksFor = async (caller: Caller) => {
 			const domain = `${caller.name}-${crypto.randomUUID()}.${SUFFIX}.test`;

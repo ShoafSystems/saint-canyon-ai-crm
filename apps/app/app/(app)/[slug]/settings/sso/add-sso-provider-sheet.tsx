@@ -30,6 +30,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
+import { DemoGate, useIsDemoUser } from "@/components/demo-gate";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -67,6 +68,7 @@ function AddSsoProviderForm() {
 	const cache = useCrmCache();
 
 	const settings = useQuery(trpc.sso.settings.queryOptions());
+	const demo = useIsDemoUser();
 
 	const providerIdId = useId();
 	const issuerId = useId();
@@ -105,10 +107,12 @@ function AddSsoProviderForm() {
 	const complete = Object.values(values).every((value) => value.trim() !== "");
 
 	return (
-		<Sheet open={open} onOpenChange={(next) => setOpen(next || null)}>
-			<SheetTrigger asChild>
-				<AddButton disabled={!settings.data?.canConfigure} />
-			</SheetTrigger>
+		<Sheet open={open && !demo} onOpenChange={(next) => setOpen(next || null)}>
+			<DemoGate>
+				<SheetTrigger asChild>
+					<AddButton disabled={!settings.data?.canConfigure} />
+				</SheetTrigger>
+			</DemoGate>
 
 			<SheetContent side="right">
 				<SheetHeader>

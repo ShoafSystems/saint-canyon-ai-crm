@@ -15,6 +15,16 @@ test("disables the wrapped action and says why for the demo user", () => {
 	expect(markup).toContain("Disabled in demo");
 });
 
+test("can put the note before a page of controls", () => {
+	const markup = renderToStaticMarkup(
+		createElement(DemoDisabled, { active: true, noteFirst: true }, action),
+	);
+
+	expect(markup.indexOf("Disabled in demo")).toBeLessThan(
+		markup.indexOf("Create API key"),
+	);
+});
+
 test("renders the action untouched for everyone else", () => {
 	const markup = renderToStaticMarkup(
 		createElement(DemoDisabled, { active: false }, action),

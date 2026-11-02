@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { DemoNote } from "@/components/demo-gate";
 import {
 	PageShell,
+	PageShellActions,
 	PageShellContent,
 	PageShellDescription,
 	PageShellHeader,
@@ -31,6 +33,10 @@ export default function MembersSettingsPage({
 						Everyone who has access to your CRM.
 					</PageShellDescription>
 				</PageShellHeading>
+
+				<PageShellActions>
+					<DemoNote />
+				</PageShellActions>
 			</PageShellHeader>
 
 			<PageShellContent className="min-h-0">

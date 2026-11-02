@@ -12,17 +12,26 @@ const DEMO_DISABLED_NOTE = "Disabled in demo"
 function DemoDisabled({
   active,
   note = DEMO_DISABLED_NOTE,
+  noteFirst = false,
   className,
   children,
 }: {
   active: boolean
   note?: string
+  /** Put the note before the controls, for a whole page of them. */
+  noteFirst?: boolean
   className?: string
   children: React.ReactNode
 }) {
   const noteId = React.useId()
 
   if (!active) return <>{children}</>
+
+  const noteElement = (
+    <span id={noteId} className="text-xs text-muted-foreground">
+      {note}
+    </span>
+  )
 
   return (
     <fieldset
@@ -31,10 +40,9 @@ function DemoDisabled({
       aria-describedby={noteId}
       className={cn("m-0 flex min-w-0 items-center gap-2 border-0 p-0", className)}
     >
+      {noteFirst ? noteElement : null}
       {children}
-      <span id={noteId} className="text-xs text-muted-foreground">
-        {note}
-      </span>
+      {noteFirst ? null : noteElement}
     </fieldset>
   )
 }

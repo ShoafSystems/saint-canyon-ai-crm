@@ -53,6 +53,7 @@ import {
 	ConversationPicker,
 	useConversations,
 } from "@/components/crm/agent-conversations";
+import { DemoGate } from "@/components/demo-gate";
 import {
 	type AgentRecord,
 	recordCopy,
@@ -284,38 +285,40 @@ function Thread({
 			) : null}
 
 			<div className="border-t px-4 py-3 sm:px-5">
-				{question ? (
-					<AgentClarificationComposer
-						key={question.requestId}
-						question={question}
-						pending={busy}
-						onSubmit={(response) => agent.respond([response])}
-					/>
-				) : (
-					<form
-						className="flex min-w-0 items-center gap-2"
-						onSubmit={(event) => {
-							event.preventDefault();
-							ask(draft);
-						}}
-					>
-						<Input
-							value={draft}
-							onChange={(event) => setDraft(event.target.value)}
-							placeholder={copy.placeholder}
-							disabled={locked}
+				<DemoGate className="flex-col items-stretch">
+					{question ? (
+						<AgentClarificationComposer
+							key={question.requestId}
+							question={question}
+							pending={busy}
+							onSubmit={(response) => agent.respond([response])}
 						/>
-						<Button
-							type="submit"
-							size="icon-sm"
-							variant="outline"
-							disabled={locked}
+					) : (
+						<form
+							className="flex min-w-0 items-center gap-2"
+							onSubmit={(event) => {
+								event.preventDefault();
+								ask(draft);
+							}}
 						>
-							{busy ? <Spinner /> : <Icon icon={Send} />}
-							<span className="sr-only">Ask</span>
-						</Button>
-					</form>
-				)}
+							<Input
+								value={draft}
+								onChange={(event) => setDraft(event.target.value)}
+								placeholder={copy.placeholder}
+								disabled={locked}
+							/>
+							<Button
+								type="submit"
+								size="icon-sm"
+								variant="outline"
+								disabled={locked}
+							>
+								{busy ? <Spinner /> : <Icon icon={Send} />}
+								<span className="sr-only">Ask</span>
+							</Button>
+						</form>
+					)}
+				</DemoGate>
 			</div>
 		</div>
 	);

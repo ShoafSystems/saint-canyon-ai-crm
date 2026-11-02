@@ -1,8 +1,10 @@
+import { isDemoUser } from "@crm/auth/demo";
 import { vendorBySlug, vendors } from "@crm/mcp-integrations/catalog";
 import GoogleLogo from "@crm/ui/components/brand-logos/google";
 import MicrosoftLogo from "@crm/ui/components/brand-logos/microsoft";
 import SlackLogo from "@crm/ui/components/brand-logos/slack";
 import { Button } from "@crm/ui/components/button";
+import { DemoDisabled } from "@crm/ui/components/demo-disabled";
 import { ProviderMark } from "@crm/ui/components/provider-mark";
 import { Spinner } from "@crm/ui/components/spinner";
 import { providerBrand } from "@crm/ui/lib/provider-brand";
@@ -29,11 +31,12 @@ async function ConnectionsSettingsPageContent({
 	params,
 	searchParams,
 }: PageProps<"/[slug]/settings/connections">) {
-	await requireSession();
+	const session = await requireSession();
+	const demo = isDemoUser(session.user.email);
 	const [{ slug }, query] = await Promise.all([params, searchParams]);
 	const queryClient = getServerQueryClient();
 	const trpc = getServerTrpc();
-	const dialogOpen = first(query.add) === "1";
+	const dialogOpen = first(query.add) === "1" && !demo;
 	const [google, microsoft, slack, mcp] = await Promise.all([
 		queryClient.fetchQuery(trpc.google.status.queryOptions()),
 		queryClient.fetchQuery(trpc.microsoft.status.queryOptions()),
@@ -121,11 +124,17 @@ async function ConnectionsSettingsPageContent({
 								send on your behalf.
 							</p>
 						</div>
-						<Button asChild variant="outline">
-							<Link href={`/${slug}/settings/connections?add=1`}>
-								Add connection
-							</Link>
-						</Button>
+						{demo ? (
+							<DemoDisabled active>
+								<Button variant="outline">Add connection</Button>
+							</DemoDisabled>
+						) : (
+							<Button asChild variant="outline">
+								<Link href={`/${slug}/settings/connections?add=1`}>
+									Add connection
+								</Link>
+							</Button>
+						)}
 					</header>
 					<div className="flex flex-col gap-3">
 						{rows.map((row) => (
@@ -145,35 +154,43 @@ async function ConnectionsSettingsPageContent({
 							your team already does.
 						</p>
 					</div>
-					<div className="flex flex-col divide-y rounded-lg border bg-card px-(--spacing-block-inline)">
-						<StarterRow
-							logo={GoogleLogo}
-							name="Google Workspace"
-							description="File email and meetings against the right company"
-							href={`/${slug}/settings/connections/google`}
-						/>
-						<StarterRow
-							logo={SlackLogo}
-							name="Slack"
-							description="Let deployed agents notify approved channels and people"
-							href={`/${slug}/settings/connections/slack`}
-						/>
-						<StarterRow
-							logo={MicrosoftLogo}
-							name="Microsoft 365"
-							description="File Outlook email against the right company"
-							href={`/${slug}/settings/connections/microsoft`}
-						/>
-					</div>
-					<p className="px-(--spacing-block-inline) text-muted-foreground text-sm">
-						Looking for something else?{" "}
-						<Link
-							className="font-medium text-foreground underline underline-offset-4"
-							href={`/${slug}/settings/connections?add=1`}
-						>
-							Browse all connections
-						</Link>
-					</p>
+					<DemoDisabled
+						active={demo}
+						noteFirst
+						className="flex-col items-stretch"
+					>
+						<div className="flex flex-col divide-y rounded-lg border bg-card px-(--spacing-block-inline)">
+							<StarterRow
+								logo={GoogleLogo}
+								name="Google Workspace"
+								description="File email and meetings against the right company"
+								href={demo ? null : `/${slug}/settings/connections/google`}
+							/>
+							<StarterRow
+								logo={SlackLogo}
+								name="Slack"
+								description="Let deployed agents notify approved channels and people"
+								href={demo ? null : `/${slug}/settings/connections/slack`}
+							/>
+							<StarterRow
+								logo={MicrosoftLogo}
+								name="Microsoft 365"
+								description="File Outlook email against the right company"
+								href={demo ? null : `/${slug}/settings/connections/microsoft`}
+							/>
+						</div>
+					</DemoDisabled>
+					{demo ? null : (
+						<p className="px-(--spacing-block-inline) text-muted-foreground text-sm">
+							Looking for something else?{" "}
+							<Link
+								className="font-medium text-foreground underline underline-offset-4"
+								href={`/${slug}/settings/connections?add=1`}
+							>
+								Browse all connections
+							</Link>
+						</p>
+					)}
 				</div>
 			)}
 			<AddConnectionDialog
@@ -254,7 +271,8 @@ function StarterRow({
 	logo: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 	name: string;
 	description: string;
-	href: string;
+	/** Null renders the button without a link, for a disabled fieldset to turn off. */
+	href: string | null;
 }) {
 	return (
 		<div className="flex items-center gap-3 py-4 text-left">
@@ -263,9 +281,15 @@ function StarterRow({
 				<h2 className="font-medium text-sm">{name}</h2>
 				<p className="text-muted-foreground text-xs">{description}</p>
 			</div>
-			<Button asChild variant="outline" size="sm">
-				<Link href={href}>Connect</Link>
-			</Button>
+			{href ? (
+				<Button asChild variant="outline" size="sm">
+					<Link href={href}>Connect</Link>
+				</Button>
+			) : (
+				<Button variant="outline" size="sm">
+					Connect
+				</Button>
+			)}
 		</div>
 	);
 }

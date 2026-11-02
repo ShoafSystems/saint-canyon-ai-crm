@@ -1,3 +1,4 @@
+import { isDemoUser } from "@crm/auth/demo";
 import { Inject } from "@nestjs/common";
 import { Ctx, Query, Router, UseMiddlewares } from "nestjs-trpc";
 import { z } from "zod";
@@ -26,7 +27,9 @@ export class UsersRouter {
 
 	@Query()
 	async me(@Ctx() ctx: AuthedTrpcContext) {
-		return this.auth.getProfile(ctx.user.id);
+		const profile = await this.auth.getProfile(ctx.user.id);
+		// Lets the app grey out what the shared public demo user cannot do.
+		return { ...profile, demo: isDemoUser(profile.email) };
 	}
 
 	@Query({

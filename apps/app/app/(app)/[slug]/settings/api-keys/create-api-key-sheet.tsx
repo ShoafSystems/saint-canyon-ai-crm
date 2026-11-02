@@ -32,6 +32,7 @@ import { useMutation } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { type ComponentProps, Suspense, useId, useState } from "react";
 import { toast } from "sonner";
+import { DemoGate, useIsDemoUser } from "@/components/demo-gate";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -71,6 +72,7 @@ export function CreateApiKeySheet() {
 function CreateApiKeyForm() {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
+	const demo = useIsDemoUser();
 
 	const nameId = useId();
 	const expirationId = useId();
@@ -98,10 +100,15 @@ function CreateApiKeyForm() {
 
 	return (
 		<>
-			<Sheet open={open} onOpenChange={(next) => setOpen(next || null)}>
-				<SheetTrigger asChild>
-					<NewApiKeyButton />
-				</SheetTrigger>
+			<Sheet
+				open={open && !demo}
+				onOpenChange={(next) => setOpen(next || null)}
+			>
+				<DemoGate>
+					<SheetTrigger asChild>
+						<NewApiKeyButton />
+					</SheetTrigger>
+				</DemoGate>
 
 				<SheetContent side="right">
 					<SheetHeader>

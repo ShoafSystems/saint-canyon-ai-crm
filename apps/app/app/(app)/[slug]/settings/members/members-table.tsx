@@ -19,6 +19,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ListSearch } from "@/components/data-table/list-search";
 import { useTableQuery } from "@/components/data-table/use-table-query";
+import { useIsDemoUser } from "@/components/demo-gate";
 import { LocalRelativeTime } from "@/components/local-date-time";
 import { useCrmCache } from "@/lib/trpc/cache";
 import { useTRPC } from "@/lib/trpc/client";
@@ -39,6 +40,7 @@ function columns(
 	canChangeRoles: boolean,
 	onChangeRole: (member: MemberRow, role: Role) => void,
 	pending: boolean,
+	demo: boolean,
 ): DataTableColumn<MemberRow>[] {
 	return [
 		{
@@ -102,11 +104,13 @@ function columns(
 			hideable: false,
 			align: "right",
 			width: "w-[6%]",
+			// The demo user sees the control, off, so the "Disabled in demo" note
+			// in the header has something to refer to.
 			cell: (row) =>
-				canChangeRoles ? (
+				canChangeRoles || demo ? (
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon" disabled={pending}>
+							<Button variant="ghost" size="icon" disabled={pending || demo}>
 								<Icon icon={OverflowMenuHorizontal} />
 								<span className="sr-only">Change {row.name}'s role</span>
 							</Button>
@@ -136,6 +140,7 @@ export function MembersTable() {
 	const trpc = useTRPC();
 	const cache = useCrmCache();
 	const { query, input } = useTableQuery(membersSearchParams);
+	const demo = useIsDemoUser();
 
 	const workspace = useQuery(trpc.workspace.get.queryOptions());
 	const members = useQuery({
@@ -175,6 +180,7 @@ export function MembersTable() {
 				workspace.data?.canChangeRoles ?? false,
 				(member, role) => setRole.mutate({ memberId: member.id, role }),
 				setRole.isPending,
+				demo,
 			)}
 			rows={members.data?.rows ?? []}
 			total={members.data?.total ?? 0}

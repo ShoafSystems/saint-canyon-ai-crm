@@ -36,6 +36,7 @@ import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, useReducer, useRef } from "react";
 import { flushSync } from "react-dom";
 import { toast } from "sonner";
+import { DemoGate, useIsDemoUser } from "@/components/demo-gate";
 import {
 	type BuilderCommandType,
 	builderCommandType,
@@ -449,7 +450,8 @@ export function AgentComposer({
 		onSuccess: () => toast.success("Stop requested."),
 		onError: () => toast.error("The agent could not be stopped. Try again."),
 	});
-	const locked = disabled || submitAction.pending;
+	const demo = useIsDemoUser();
+	const locked = disabled || demo || submitAction.pending;
 	const canSend =
 		state.draft.trim().length > 0 && !locked && !state.attachmentsReading;
 
@@ -507,96 +509,98 @@ export function AgentComposer({
 	};
 
 	return (
-		<div
-			className={cn(
-				CHAT_COMPOSER_SURFACE_CLASS_NAME,
-				mode === "home" ? "min-h-24" : "min-h-[78px]",
-			)}
-		>
-			<ComposerEditor
-				editorRef={editor}
-				composingRef={composing}
-				mode={mode}
-				state={state}
-				disabled={locked}
-				onChanged={updateEditor}
-				onSelectionChanged={(offset) => {
-					selectionOffset.current = offset;
-				}}
-				onRemoveContext={removeContext}
-				onSubmit={submit}
-			/>
-
-			<div className="flex h-7 items-center justify-between">
-				<div className="flex min-w-0 items-center gap-1">
-					{permissionControl}
-					<ComposerTools
-						state={state}
-						resources={resourceResults.data ?? []}
-						resourcesLoading={resourceResults.isFetching}
-						resourcesReady={resourceResults.isSuccess}
-						connectedGoogle={connectedGoogle}
-						disabled={locked}
-						attachmentsReading={state.attachmentsReading}
-						dispatch={dispatch}
-						getInsertionOffset={() => selectionOffset.current}
-						onContextAdded={focusAfterContext}
-					/>
-				</div>
-
-				{busy && onStop ? (
-					<Button
-						variant="default"
-						size="icon-sm"
-						disabled={stopAction.pending}
-						aria-busy={stopAction.pending}
-						aria-label="Stop reply"
-						onClick={() => stopAction.run()}
-						className="rounded-full"
-					>
-						<AsyncButtonContent
-							status={stopAction.status}
-							pendingLabel={<span className="sr-only">Stopping</span>}
-							successLabel={<span className="sr-only">Stopping</span>}
-							errorLabel={<span className="sr-only">Stop failed</span>}
-						>
-							<Icon icon={StopFilled} motion="none" />
-						</AsyncButtonContent>
-					</Button>
-				) : (
-					<Button
-						variant="default"
-						size="icon-sm"
-						disabled={!canSend}
-						aria-busy={submitAction.pending || state.attachmentsReading}
-						aria-label={
-							state.attachmentsReading
-								? "Preparing attachments"
-								: "Send message"
-						}
-						onClick={submit}
-						className="rounded-full"
-					>
-						<AsyncButtonContent
-							status={
-								state.attachmentsReading ? "pending" : submitAction.status
-							}
-							pendingLabel={
-								<span className="sr-only">
-									{state.attachmentsReading
-										? "Preparing attachments"
-										: "Sending"}
-								</span>
-							}
-							successLabel={<span className="sr-only">Sent</span>}
-							errorLabel={<span className="sr-only">Send failed</span>}
-						>
-							<Icon icon={ArrowUp} />
-						</AsyncButtonContent>
-					</Button>
+		<DemoGate className="flex-col items-stretch">
+			<div
+				className={cn(
+					CHAT_COMPOSER_SURFACE_CLASS_NAME,
+					mode === "home" ? "min-h-24" : "min-h-[78px]",
 				)}
+			>
+				<ComposerEditor
+					editorRef={editor}
+					composingRef={composing}
+					mode={mode}
+					state={state}
+					disabled={locked}
+					onChanged={updateEditor}
+					onSelectionChanged={(offset) => {
+						selectionOffset.current = offset;
+					}}
+					onRemoveContext={removeContext}
+					onSubmit={submit}
+				/>
+
+				<div className="flex h-7 items-center justify-between">
+					<div className="flex min-w-0 items-center gap-1">
+						{permissionControl}
+						<ComposerTools
+							state={state}
+							resources={resourceResults.data ?? []}
+							resourcesLoading={resourceResults.isFetching}
+							resourcesReady={resourceResults.isSuccess}
+							connectedGoogle={connectedGoogle}
+							disabled={locked}
+							attachmentsReading={state.attachmentsReading}
+							dispatch={dispatch}
+							getInsertionOffset={() => selectionOffset.current}
+							onContextAdded={focusAfterContext}
+						/>
+					</div>
+
+					{busy && onStop ? (
+						<Button
+							variant="default"
+							size="icon-sm"
+							disabled={stopAction.pending}
+							aria-busy={stopAction.pending}
+							aria-label="Stop reply"
+							onClick={() => stopAction.run()}
+							className="rounded-full"
+						>
+							<AsyncButtonContent
+								status={stopAction.status}
+								pendingLabel={<span className="sr-only">Stopping</span>}
+								successLabel={<span className="sr-only">Stopping</span>}
+								errorLabel={<span className="sr-only">Stop failed</span>}
+							>
+								<Icon icon={StopFilled} motion="none" />
+							</AsyncButtonContent>
+						</Button>
+					) : (
+						<Button
+							variant="default"
+							size="icon-sm"
+							disabled={!canSend}
+							aria-busy={submitAction.pending || state.attachmentsReading}
+							aria-label={
+								state.attachmentsReading
+									? "Preparing attachments"
+									: "Send message"
+							}
+							onClick={submit}
+							className="rounded-full"
+						>
+							<AsyncButtonContent
+								status={
+									state.attachmentsReading ? "pending" : submitAction.status
+								}
+								pendingLabel={
+									<span className="sr-only">
+										{state.attachmentsReading
+											? "Preparing attachments"
+											: "Sending"}
+									</span>
+								}
+								successLabel={<span className="sr-only">Sent</span>}
+								errorLabel={<span className="sr-only">Send failed</span>}
+							>
+								<Icon icon={ArrowUp} />
+							</AsyncButtonContent>
+						</Button>
+					)}
+				</div>
 			</div>
-		</div>
+		</DemoGate>
 	);
 }
 
