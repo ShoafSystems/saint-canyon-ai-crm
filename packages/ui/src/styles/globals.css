@@ -180,7 +180,7 @@
 			rgb(255 255 255 / 0.085) 34%,
 			rgb(255 255 255 / 0.07) 100%
 		);
-	--glass-chrome: rgb(10 12 16 / 0.18);
+	--glass-chrome: rgb(10 12 16 / 0.22);
 	--glass-chrome-sheen: linear-gradient(
 		180deg,
 		rgb(255 255 255 / 0.16) 0%,
@@ -188,6 +188,17 @@
 	);
 	--glass-control: rgb(255 255 255 / 0.1);
 	--glass-control-hover: rgb(255 255 255 / 0.16);
+	--glass-control-scrim: rgb(8 10 14 / 0.38);
+	--glass-control-sheen: linear-gradient(
+		180deg,
+		rgb(255 255 255 / 0.15),
+		rgb(255 255 255 / 0.08)
+	);
+	--glass-control-sheen-hover: linear-gradient(
+		180deg,
+		rgb(255 255 255 / 0.22),
+		rgb(255 255 255 / 0.13)
+	);
 	--glass-lane: rgb(255 255 255 / 0.03);
 	--glass-radius: 22px;
 	/* The rim: bright where the light hits (top / top-left), nearly gone at
@@ -211,9 +222,14 @@
 		0 2px 6px rgb(0 0 0 / 0.22), 0 20px 44px -14px rgb(0 0 0 / 0.55),
 		0 40px 80px -32px rgb(0 0 0 / 0.55);
 	/* Selected states are tinted glass lime; solid lime is the primary CTA only. */
-	--glass-active: rgb(197 240 74 / 0.2);
+	--glass-active-scrim: rgb(8 12 4 / 0.42);
+	--glass-active-sheen: linear-gradient(
+		180deg,
+		rgb(214 247 120 / 0.34),
+		rgb(197 240 74 / 0.2)
+	);
 	--glass-active-edge: rgb(214 247 120 / 0.5);
-	--glass-active-foreground: #eaffb4;
+	--glass-active-foreground: #f4ffd6;
 	--glass-warning: #f7b844;
 	--glass-warning-foreground: #241700;
 	/* Fine grain over the colour, which the blur in each pane smooths away. */
@@ -279,7 +295,11 @@
 		--glass-chrome-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
 		--glass-control: #262a22;
 		--glass-control-hover: #30352b;
-		--glass-active: #2e3a14;
+		--glass-control-scrim: #262a22;
+		--glass-control-sheen: none;
+		--glass-control-sheen-hover: linear-gradient(#30352b, #30352b);
+		--glass-active-scrim: #2e3a14;
+		--glass-active-sheen: none;
 		--glass-lane: #121410;
 		--glass-blur: none;
 		--glass-blur-soft: none;
@@ -297,7 +317,11 @@
 		--glass-chrome-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
 		--glass-control: #262a22;
 		--glass-control-hover: #30352b;
-		--glass-active: #2e3a14;
+		--glass-control-scrim: #262a22;
+		--glass-control-sheen: none;
+		--glass-control-sheen-hover: linear-gradient(#30352b, #30352b);
+		--glass-active-scrim: #2e3a14;
+		--glass-active-sheen: none;
 		--glass-lane: #121410;
 		--overlay: rgb(4 6 3 / 0.75);
 		--glass-blur: none;
@@ -640,9 +664,14 @@
 		color: rgb(242 244 238 / 0.86);
 	}
 
-	/* Pill controls: buttons, fields and selects (joined button groups keep
-	   their own shape). */
+	/* Pill controls: buttons (also when a trigger renders them), fields and
+	   selects (joined button groups keep their own shape). */
 	.dark [data-slot="button"]:not([data-slot="button-group"] *),
+	.dark
+		:is(button, a)[data-variant][data-size]:not(
+			[data-slot^="toggle"],
+			[data-slot="button-group"] *
+		),
 	.dark [data-slot="select-trigger"],
 	.dark [data-slot="input-group"],
 	.dark [data-slot="input"]:not([data-slot="input-group"] *) {
@@ -652,12 +681,12 @@
 	/* Controls are the third layer: a brighter wash of the same glass with
 	   its own top highlight — secondary buttons, chips, badges, initials. */
 	.dark
-		[data-slot="button"]:is(
+		:is(button, a):not([data-slot^="toggle"]):is(
 			[data-variant="outline"],
 			[data-variant="secondary"],
 			[data-variant="contrast"]
 		),
-	.dark [data-slot="select-trigger"],
+	.dark [data-slot="select-trigger"].border-input,
 	.dark
 		[data-slot="badge"]:is(
 			[data-variant="secondary"],
@@ -667,13 +696,9 @@
 	.dark [data-slot="avatar-fallback"],
 	.dark [data-slot="entity-logo"].bg-muted {
 		border-color: rgb(255 255 255 / 0.1);
-		border-top-color: rgb(255 255 255 / 0.22);
-		background-color: var(--glass-control);
-		background-image: linear-gradient(
-			180deg,
-			rgb(255 255 255 / 0.06),
-			transparent
-		);
+		border-top-color: rgb(255 255 255 / 0.2);
+		background-color: var(--glass-control-scrim);
+		background-image: var(--glass-control-sheen);
 		color: var(--foreground);
 		box-shadow:
 			inset 0 1px 0 0 rgb(255 255 255 / 0.1),
@@ -681,23 +706,28 @@
 		-webkit-backdrop-filter: blur(16px) saturate(180%);
 		backdrop-filter: blur(16px) saturate(180%);
 	}
+	/* Labels on a control (the Enrichment chip's status) take the full
+	   foreground, since the colour behind a pill can be bright. */
+	.dark :is(button, a)[data-variant] [data-slot="status-indicator"] {
+		color: var(--foreground);
+	}
 	.dark [data-slot="avatar-fallback"],
 	.dark [data-slot="entity-logo"].bg-muted {
-		border: 1px solid rgb(255 255 255 / 0.12);
-		border-top-color: rgb(255 255 255 / 0.24);
+		border: 1px solid rgb(255 255 255 / 0.1);
+		border-top-color: rgb(255 255 255 / 0.18);
 		font-weight: 600;
 	}
 	.dark [data-slot="entity-logo"].bg-muted {
 		border-radius: 9999px;
 	}
 	.dark
-		[data-slot="button"]:is(
+		:is(button, a):not([data-slot^="toggle"]):is(
 			[data-variant="outline"],
 			[data-variant="secondary"],
 			[data-variant="contrast"]
 		):is(:hover, [aria-expanded="true"]),
-	.dark [data-slot="select-trigger"]:hover {
-		background-color: var(--glass-control-hover);
+	.dark [data-slot="select-trigger"].border-input:hover {
+		background-image: var(--glass-control-sheen-hover);
 		color: var(--foreground);
 	}
 	/* The primary action is the only solid lime. */
@@ -713,7 +743,8 @@
 		border: 1px solid rgb(255 255 255 / 0.1);
 		border-top-color: rgb(255 255 255 / 0.2);
 		border-radius: 9999px;
-		background-color: var(--glass-control);
+		background-color: var(--glass-control-scrim);
+		background-image: var(--glass-control-sheen);
 		box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.08);
 		-webkit-backdrop-filter: blur(16px) saturate(180%);
 		backdrop-filter: blur(16px) saturate(180%);
@@ -729,7 +760,8 @@
 		padding: 2px;
 		border: 1px solid rgb(255 255 255 / 0.1);
 		border-top-color: rgb(255 255 255 / 0.2);
-		background-color: var(--glass-control);
+		background-color: var(--glass-control-scrim);
+		background-image: var(--glass-control-sheen);
 		box-shadow:
 			inset 0 1px 0 0 rgb(255 255 255 / 0.08),
 			0 1px 2px rgb(0 0 0 / 0.2);
@@ -741,7 +773,7 @@
 		> [data-slot="toggle-group-item"] {
 		border-radius: 9999px;
 		border-color: transparent;
-		color: rgb(242 244 238 / 0.86);
+		color: var(--foreground);
 	}
 	.dark
 		[data-slot="toggle-group"][data-spacing="0"]
@@ -766,12 +798,8 @@
 		[data-slot="tabs-trigger"][data-state="active"],
 	.dark [data-slot="app-rail"] [aria-current="page"] {
 		border-color: transparent;
-		background-color: var(--glass-active);
-		background-image: linear-gradient(
-			180deg,
-			rgb(255 255 255 / 0.12),
-			transparent 70%
-		);
+		background-color: var(--glass-active-scrim);
+		background-image: var(--glass-active-sheen);
 		color: var(--glass-active-foreground);
 		box-shadow:
 			inset 0 0 0 1px var(--glass-active-edge),

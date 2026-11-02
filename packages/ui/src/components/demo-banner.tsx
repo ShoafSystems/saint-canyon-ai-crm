@@ -25,7 +25,7 @@ function WarningIcon({ className }: { className?: string }) {
 
 /** What the narrow layouts show in place of the full lines. */
 const DEMO_BANNER_SHORT = "sample data · don't enter real info"
-const DEMO_BANNER_CARD_LINE = "Shared sample data. Don't enter real information."
+const DEMO_BANNER_CARD_LINE = "Sample data. Don't enter real info."
 
 /**
  * The notice every visitor of the shared public demo sees. Plain markup with
