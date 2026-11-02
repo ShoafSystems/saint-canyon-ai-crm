@@ -19,7 +19,7 @@ export function AuthShell({ children }: { children: ReactNode }) {
 					<Link
 						href="/"
 						aria-label="Homepage"
-						className="flex w-fit items-center gap-3 font-medium text-muted-foreground text-sm/5 tracking-wide"
+						className="flex w-fit items-center gap-3 font-medium text-muted-foreground text-sm/5"
 					>
 						<Logo className="size-6 shrink-0 text-foreground" />
 						CRM

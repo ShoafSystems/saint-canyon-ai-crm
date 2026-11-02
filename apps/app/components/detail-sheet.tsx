@@ -39,7 +39,7 @@ import {
 const GUTTER = "px-5";
 
 export const SECTION_TITLE =
-	"font-medium text-muted-foreground text-xs uppercase tracking-wider";
+	"font-medium text-muted-foreground text-sm";
 
 export const PROPERTY_ROW = "grid grid-cols-[6.5rem_minmax(0,1fr)] gap-2";
 

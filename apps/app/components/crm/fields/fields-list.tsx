@@ -313,7 +313,7 @@ export function FieldsList({
 						) : (
 							<>
 								<div className="flex items-center justify-between gap-3 px-5 pt-3.5 pb-2">
-									<span className="font-medium text-muted-foreground text-xs uppercase tracking-wider">
+									<span className="font-medium text-muted-foreground text-sm">
 										{CUSTOM_GROUP}
 									</span>
 									<span className="text-muted-foreground text-xs">
