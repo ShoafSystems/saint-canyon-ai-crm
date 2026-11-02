@@ -161,14 +161,31 @@
 	--glass-blur-soft: blur(14px) saturate(150%);
 	--glass-edge: rgb(255 255 255 / 0.1);
 	--glass-highlight: inset 0 1px 0 0 rgb(255 255 255 / 0.07);
-	--glass-depth: 0 1px 2px rgb(0 0 0 / 0.22), 0 14px 36px -14px rgb(0 0 0 / 0.6);
+	--glass-depth:
+		0 1px 2px rgb(0 0 0 / 0.22), 0 14px 36px -14px rgb(0 0 0 / 0.6);
 	--glass-float: 0 2px 8px rgb(0 0 0 / 0.3), 0 28px 64px -18px rgb(0 0 0 / 0.7);
 	--glass-chrome: rgb(14 16 12 / 0.55);
 	--glass-backdrop:
-		radial-gradient(48vmax 38vmax at 6% -6%, rgb(150 196 44 / 0.26), transparent 62%),
-		radial-gradient(42vmax 36vmax at 98% 4%, rgb(32 136 116 / 0.22), transparent 64%),
-		radial-gradient(52vmax 40vmax at 76% 104%, rgb(196 128 44 / 0.16), transparent 62%),
-		radial-gradient(40vmax 34vmax at 10% 100%, rgb(116 74 150 / 0.16), transparent 64%),
+		radial-gradient(
+			48vmax 38vmax at 6% -6%,
+			rgb(150 196 44 / 0.26),
+			transparent 62%
+		),
+		radial-gradient(
+			42vmax 36vmax at 98% 4%,
+			rgb(32 136 116 / 0.22),
+			transparent 64%
+		),
+		radial-gradient(
+			52vmax 40vmax at 76% 104%,
+			rgb(196 128 44 / 0.16),
+			transparent 62%
+		),
+		radial-gradient(
+			40vmax 34vmax at 10% 100%,
+			rgb(116 74 150 / 0.16),
+			transparent 64%
+		),
 		linear-gradient(160deg, #10130d 0%, #0b0d0a 55%, #0d0f0b 100%);
 }
 
@@ -177,7 +194,10 @@
  * glass turns into opaque smoked fills with the same hue, so text never sits
  * on an unblurred, busy backdrop.
  */
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+@supports not (
+		(backdrop-filter: blur(1px)) or
+		(-webkit-backdrop-filter: blur(1px))
+	) {
 	.dark {
 		--card: #1b1e18;
 		--popover: #1d2019;
@@ -340,15 +360,15 @@
 @layer utilities {
 	/* Panels: cards, KPI strips, charts, tables, board columns. */
 	.dark
-		:is(
-			[data-slot="card-content"],
-			[data-slot="card-panel"],
-			[data-slot="stat-group"],
-			[data-slot="chart-card"],
-			[data-slot="kpi-card"],
-			[data-slot="table-container"].bg-card,
-			[data-slot="auth-card"]
-		) {
+	:is(
+		[data-slot="card-content"],
+		[data-slot="card-panel"],
+		[data-slot="stat-group"],
+		[data-slot="chart-card"],
+		[data-slot="kpi-card"],
+		[data-slot="table-container"].bg-card,
+		[data-slot="auth-card"]
+	) {
 		border-color: var(--glass-edge);
 		border-radius: var(--radius-xl);
 		background-color: var(--card);
@@ -359,16 +379,16 @@
 
 	/* Floating layers: menus, popovers, tooltips, dialogs, sheets. */
 	.dark
-		:is(
-			[data-slot="dropdown-menu-content"],
-			[data-slot="dropdown-menu-sub-content"],
-			[data-slot="popover-content"],
-			[data-slot="select-content"],
-			[data-slot="dialog-content"],
-			[data-slot="alert-dialog-content"],
-			[data-slot="drawer-content"],
-			[data-slot="sheet-content"]
-		) {
+	:is(
+		[data-slot="dropdown-menu-content"],
+		[data-slot="dropdown-menu-sub-content"],
+		[data-slot="popover-content"],
+		[data-slot="select-content"],
+		[data-slot="dialog-content"],
+		[data-slot="alert-dialog-content"],
+		[data-slot="drawer-content"],
+		[data-slot="sheet-content"]
+	) {
 		background-color: var(--popover);
 		box-shadow: var(--glass-highlight), var(--glass-float);
 		-webkit-backdrop-filter: var(--glass-blur);
@@ -457,19 +477,25 @@
 		border-radius: 9999px;
 		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
 	}
-	.dark [data-slot="tabs-list"][data-variant="default"] [data-slot="tabs-trigger"] {
+	.dark
+		[data-slot="tabs-list"][data-variant="default"]
+		[data-slot="tabs-trigger"] {
 		border-radius: 9999px;
 		padding-inline: 10px;
 	}
 	.dark [data-slot="toggle-group"][data-spacing="0"] {
 		border-radius: 9999px;
 	}
-	.dark [data-slot="toggle-group"][data-spacing="0"] > [data-slot="toggle-group-item"]:first-child {
+	.dark
+		[data-slot="toggle-group"][data-spacing="0"]
+		> [data-slot="toggle-group-item"]:first-child {
 		border-start-start-radius: 9999px;
 		border-end-start-radius: 9999px;
 		padding-inline-start: 12px;
 	}
-	.dark [data-slot="toggle-group"][data-spacing="0"] > [data-slot="toggle-group-item"]:last-child {
+	.dark
+		[data-slot="toggle-group"][data-spacing="0"]
+		> [data-slot="toggle-group-item"]:last-child {
 		border-start-end-radius: 9999px;
 		border-end-end-radius: 9999px;
 		padding-inline-end: 12px;
@@ -502,9 +528,21 @@
 		background-color: rgb(255 255 255 / 0.09);
 	}
 
-	/* Fields sit in the glass instead of punching dark holes in it. */
-	.dark :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]) {
+	/* Fields sit in the glass instead of punching dark holes in it (ghost
+	   fields keep their own transparent background). */
+	.dark :is([data-slot="input"], [data-slot="textarea"]).bg-background {
 		background-color: rgb(255 255 255 / 0.05);
+	}
+
+	/* Programmatic focus on an opened layer gets a quiet edge, not the accent. */
+	.dark
+	:is(
+		[data-slot="sheet-content"],
+		[data-slot="drawer-content"],
+		[data-slot="dialog-content"],
+		[data-slot="alert-dialog-content"]
+	):focus-visible {
+		outline-color: var(--glass-edge);
 	}
 }
 

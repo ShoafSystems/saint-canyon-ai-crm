@@ -2,6 +2,7 @@
 
 import {
 	Card,
+	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
@@ -227,7 +228,7 @@ function ChartPanel({
 				<CardTitle>{title}</CardTitle>
 				{description ? <CardDescription>{description}</CardDescription> : null}
 			</CardHeader>
-			<div className="flex flex-1 flex-col border">{children}</div>
+			<CardContent className="flex-1 gap-0 p-0 md:p-0">{children}</CardContent>
 		</Card>
 	);
 }

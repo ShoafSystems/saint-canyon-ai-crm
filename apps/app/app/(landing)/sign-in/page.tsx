@@ -48,7 +48,10 @@ export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
 		<AuthShell>
 			<Suspense
 				fallback={
-					<AuthHeading title="Sign in" description="Checking how you can sign in…" />
+					<AuthHeading
+						title="Sign in"
+						description="Checking how you can sign in…"
+					/>
 				}
 			>
 				<SignIn searchParams={searchParams} />
