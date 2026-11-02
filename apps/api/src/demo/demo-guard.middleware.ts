@@ -9,6 +9,7 @@ import type {
 } from "nestjs-trpc";
 import type { BaseTrpcContext } from "../trpc/context.types";
 import { REST_BRIDGE_PATH } from "../trpc/openapi";
+import { runAsDemoActor } from "./demo-actor";
 import { isRefusedForDemo } from "./demo-policy";
 
 @Injectable()
@@ -32,6 +33,8 @@ export class DemoGuardMiddleware implements TRPCMiddleware {
 			});
 		}
 
-		return opts.next();
+		// Writes the demo may make still must not start agent work: no events
+		// for operator-deployed agents, no research turns.
+		return runAsDemoActor(() => opts.next());
 	}
 }

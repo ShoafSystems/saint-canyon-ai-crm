@@ -19,20 +19,31 @@ const BLOCKED_ROUTERS = new Set([
 ]);
 
 // Single mutations elsewhere that start agent turns, call a paid research
-// service, or publish data outside the CRM.
+// service, publish data outside the CRM, or delete rows for good. Archiving
+// stays open: it is reversible and every visitor can restore what another
+// archived.
 const BLOCKED_PROCEDURES = new Set([
 	"companies.bulkEnrich",
+	"companies.bulkPurge",
 	"companies.enrich",
+	"companies.purge",
 	"companies.research",
 	"contacts.bulkEnrich",
+	"contacts.bulkPurge",
 	"contacts.enrich",
+	"contacts.purge",
 	"conversations.answerBuilderApproval",
 	"conversations.answerBuilderQuestion",
 	"conversations.createBuilder",
 	"conversations.createShare",
+	"conversations.remove",
 	"conversations.setBuilderPermissionMode",
 	"conversations.submitBuilder",
+	"deals.bulkPurge",
+	"deals.purge",
 	"fields.backfill",
+	"fields.delete",
+	"savedViews.delete",
 ]);
 
 export type DemoCall = {

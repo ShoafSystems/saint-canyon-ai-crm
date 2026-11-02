@@ -44,11 +44,29 @@ describe("isRefusedForDemo", () => {
 		}
 	});
 
+	it("refuses every permanent delete", () => {
+		for (const path of [
+			"companies.purge",
+			"companies.bulkPurge",
+			"contacts.purge",
+			"contacts.bulkPurge",
+			"deals.purge",
+			"deals.bulkPurge",
+			"fields.delete",
+			"savedViews.delete",
+			"conversations.remove",
+		]) {
+			expect(isRefusedForDemo(call(path))).toBe(true);
+		}
+	});
+
 	it("leaves reads and ordinary CRM edits alone", () => {
 		expect(isRefusedForDemo(call("settings.agentModel", "query"))).toBe(false);
 		expect(isRefusedForDemo(call("google.thread", "query"))).toBe(false);
 		expect(isRefusedForDemo(call("deals.setStage"))).toBe(false);
 		expect(isRefusedForDemo(call("contacts.update"))).toBe(false);
+		expect(isRefusedForDemo(call("deals.archive"))).toBe(false);
+		expect(isRefusedForDemo(call("companies.bulkArchive"))).toBe(false);
 	});
 
 	it("refuses anything over the REST bridge or with an API key", () => {

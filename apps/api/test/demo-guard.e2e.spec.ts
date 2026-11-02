@@ -211,6 +211,15 @@ const blockedMutations: [string, unknown][] = [
 	["companies.enrich", { id: "x" }],
 	["contacts.enrich", { id: "x" }],
 	["fields.backfill", { id: "x" }],
+	["companies.purge", { id: "x" }],
+	["companies.bulkPurge", { ids: ["x"] }],
+	["contacts.purge", { id: "x" }],
+	["contacts.bulkPurge", { ids: ["x"] }],
+	["deals.purge", { id: "x" }],
+	["deals.bulkPurge", { ids: ["x"] }],
+	["fields.delete", { id: "x" }],
+	["savedViews.delete", { id: "x" }],
+	["conversations.remove", { id: "x" }],
 ];
 
 describe("tRPC mutations the demo user may not make", () => {
@@ -230,6 +239,30 @@ describe("what the demo user can still do", () => {
 	it("reads the CRM", async () => {
 		await trpcQuery(demo, "users.list").expect(200);
 		await trpcQuery(demo, "settings.agentModel").expect(200);
+	});
+
+	it("writes to the CRM without queueing any agent work", async () => {
+		const tasksFor = async (caller: Caller) => {
+			const domain = `${caller.name}-${crypto.randomUUID()}.${SUFFIX}.test`;
+			await trpcMutation(caller, "companies.create", {
+				name: `Trigger probe (${caller.name})`,
+				domain,
+			}).expect(200);
+			const company = await db.company.findFirstOrThrow({
+				where: { domain },
+				select: { id: true },
+			});
+			const tasks = await db.agentTask.findMany({
+				where: { companyId: company.id },
+				select: { kind: true },
+			});
+			await db.agentTask.deleteMany({ where: { companyId: company.id } });
+			await db.company.delete({ where: { id: company.id } });
+			return tasks.map((task) => task.kind);
+		};
+
+		expect(await tasksFor(demo)).toEqual([]);
+		expect((await tasksFor(member)).length).toBeGreaterThan(0);
 	});
 });
 

@@ -6,6 +6,7 @@ import { lockIdempotencyKey } from "@crm/db/idempotency";
 import { fieldBackfillPayload } from "@crm/validation/field-backfill";
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectDatabase } from "../database/database.constants";
+import { actingAsDemoUser } from "../demo/demo-actor";
 import { AGENT_DISPATCH } from "./agent-dispatch.config";
 import { bridge } from "./bridge";
 
@@ -200,6 +201,7 @@ export class AgentTriggerService {
 		const queued: CrmEventInput[] = [];
 		const result = await this.db.$transaction((tx) =>
 			work(tx, async (input) => {
+				if (this.skippedForDemo(input.type)) return;
 				await this.createEventTask(tx, input);
 				queued.push(input);
 			}),
@@ -227,6 +229,7 @@ export class AgentTriggerService {
 		if (ids.length === 0 || keys.length === 0) {
 			return { queued: 0, merged: 0 };
 		}
+		if (this.skippedForDemo("field-backfill")) return { queued: 0, merged: 0 };
 
 		const column = RECORD_ID_COLUMNS[entity];
 		let queued = 0;
@@ -389,6 +392,7 @@ export class AgentTriggerService {
 		const subject = input.contactIds ? "contactId" : "companyId";
 		const ids = [...new Set(input.contactIds ?? input.companyIds ?? [])];
 		if (ids.length === 0) return { queued: 0, alreadyQueued: 0 };
+		if (this.skippedForDemo(input.kind)) return { queued: 0, alreadyQueued: 0 };
 
 		try {
 			const outstanding = await this.db.agentTask.findMany({
@@ -457,6 +461,8 @@ export class AgentTriggerService {
 		required = false,
 		client?: Prisma.TransactionClient,
 	): Promise<boolean> {
+		if (this.skippedForDemo(task.kind)) return false;
+
 		try {
 			const write = async (tx: Prisma.TransactionClient) => {
 				await lockIdempotencyKey(
@@ -515,6 +521,14 @@ export class AgentTriggerService {
 			if (required) throw error;
 			return false;
 		}
+	}
+
+	// The public demo user's edits never reach an agent: not the CRM events
+	// operator-deployed agents subscribe to, not research turns.
+	private skippedForDemo(kind: string): boolean {
+		if (!actingAsDemoUser()) return false;
+		this.logger.log({ message: "Agent work skipped for the demo user", kind });
+		return true;
 	}
 
 	private async createEventTask(
