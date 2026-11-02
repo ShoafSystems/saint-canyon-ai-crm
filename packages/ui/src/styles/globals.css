@@ -540,6 +540,13 @@
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel-scroll"] {
 		margin-inline: -8px;
 	}
+	/* The scroller's own inline padding holds that 8px overhang, so four
+	   columns that fit don't count as overflow (no stray carousel arrows). */
+	.dark [data-slot="deals-board"] {
+		margin-inline: -8px;
+		padding-inline: 8px;
+		scroll-padding-inline: 8px;
+	}
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel-empty"] {
 		min-height: 88px;
 		border: 1px dashed rgb(255 255 255 / 0.1);
