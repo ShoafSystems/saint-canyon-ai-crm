@@ -23,6 +23,7 @@ import {
 	PieChart,
 	Text,
 	XAxis,
+	YAxis,
 } from "recharts";
 
 type Datum = Record<string, number | string | null>;
@@ -215,14 +216,21 @@ function AreaTrend({
 	stacked = false,
 	variant = "gradient",
 	bloom = "low",
+	dashed = [],
+	formatY,
 }: CartesianProps & {
 	stacked?: boolean;
 	variant?: DitherVariant;
 	bloom?: Bloom;
+	/** Series drawn as a dashed line with no fill, to set them apart. */
+	dashed?: string[];
+	/** Shows a value axis, labelled with this formatter. */
+	formatY?: (value: number) => string;
 }) {
 	const keys = seriesKeys(config, series);
 	const gradientId = React.useId().replace(/:/g, "");
 	const dithered = variant !== "solid";
+	const filled = keys.filter((key) => !dashed.includes(key));
 
 	return (
 		<ChartContainer
@@ -253,15 +261,27 @@ function AreaTrend({
 							/>
 						</linearGradient>
 					))}
-					<DitherDefs base={gradientId} keys={keys} variant={variant} />
+					<DitherDefs base={gradientId} keys={filled} variant={variant} />
 				</defs>
 				<CartesianGrid vertical={false} stroke="var(--border)" />
 				<XAxis
 					dataKey={xKey}
 					hide={!showXAxis}
+					interval={0}
 					tick={<EdgeTick formatX={formatX} />}
 					{...X_AXIS_PROPS}
 				/>
+				{formatY ? (
+					<YAxis
+						width={52}
+						tickLine={false}
+						axisLine={false}
+						tickMargin={8}
+						tickCount={4}
+						tickFormatter={(value) => formatY(Number(value))}
+						tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+					/>
+				) : null}
 				{tooltip(formatX, formatValue)}
 				{keys.map((key) => (
 					<Area
@@ -270,7 +290,10 @@ function AreaTrend({
 						type="monotone"
 						stroke={`var(--color-${key})`}
 						strokeWidth={2}
-						fill={`url(#${gradientId}-${key})`}
+						strokeDasharray={dashed.includes(key) ? "6 4" : undefined}
+						fill={
+							dashed.includes(key) ? "none" : `url(#${gradientId}-${key})`
+						}
 						stackId={stacked ? "stack" : undefined}
 						dot={false}
 						activeDot={{ r: 3, strokeWidth: 0 }}
@@ -282,7 +305,7 @@ function AreaTrend({
 					/>
 				))}
 				{dithered
-					? keys.map((key) => (
+					? filled.map((key) => (
 							<Area
 								key={`dither-${key}`}
 								dataKey={key}
@@ -490,10 +513,13 @@ function DonutStat({
 					stroke="none"
 					isAnimationActive={false}
 				/>
+				{/* Slices run clockwise from 12 o'clock, in the order given. */}
 				<Pie
 					data={data}
 					dataKey="value"
 					nameKey="key"
+					startAngle={90}
+					endAngle={-270}
 					innerRadius={innerRadius}
 					outerRadius={outerRadius}
 					paddingAngle={data.length > 1 ? 2 : 0}

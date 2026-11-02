@@ -25,9 +25,11 @@ import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 
 type Summary = RouterOutputs["dashboard"]["summary"];
 
+// Closed won wears the closed-stage colour (see dealStageColor), dashed, and
+// is drawn last so the pipeline fill never hides it.
 const TREND_CONFIG: ChartConfig = {
-	won: { label: "Closed won", color: "var(--success)" },
 	created: { label: "New pipeline", color: "var(--chart-1)" },
+	won: { label: "Closed won", color: "var(--chart-5)" },
 };
 
 function changeDelta(
@@ -157,6 +159,8 @@ export function SalesDashboard({ summary }: { summary: Summary }) {
 								variant="gradient"
 								bloom="high"
 								showLegend
+								dashed={["won"]}
+								formatY={money}
 								formatValue={exact}
 							/>
 						</div>
@@ -187,7 +191,7 @@ export function SalesDashboard({ summary }: { summary: Summary }) {
 										>
 											<span
 												aria-hidden
-												className="size-1.5 shrink-0"
+												className="size-2 shrink-0 rounded-full"
 												style={{ backgroundColor: slice.color }}
 											/>
 											<span className="min-w-0 flex-1 truncate">

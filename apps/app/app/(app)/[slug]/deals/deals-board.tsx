@@ -33,7 +33,11 @@ import {
 	useStageMutation,
 } from "@/components/crm/stage-change";
 import { useTableQuery } from "@/components/data-table/use-table-query";
-import { DEAL_STAGE_OPTIONS, LOSING_STAGES } from "@/lib/deal-stage";
+import {
+	DEAL_STAGE_OPTIONS,
+	dealStageColor,
+	LOSING_STAGES,
+} from "@/lib/deal-stage";
 import { SEARCH_PARAM } from "@/lib/search-param-keys";
 import { useTRPC } from "@/lib/trpc/client";
 import type { RouterOutputs } from "@/lib/trpc/types";
@@ -150,7 +154,14 @@ export function DealsBoard() {
 							onDrop={drop(column.stage)}
 						>
 							<CardHeader>
-								<CardTitle>{LABELS.get(column.stage)}</CardTitle>
+								<CardTitle className="flex items-center gap-2">
+									<span
+										aria-hidden
+										className="size-2 shrink-0 rounded-full"
+										style={{ backgroundColor: dealStageColor(column.stage) }}
+									/>
+									{LABELS.get(column.stage)}
+								</CardTitle>
 								<CardAction>
 									<span className="text-muted-foreground text-xs tabular-nums">
 										{column.deals.length}
@@ -258,11 +269,13 @@ function DealCard({
 				className="flex min-w-0 flex-col gap-1 text-left"
 			>
 				<span className="truncate font-medium">{deal.name}</span>
-				<CompanyCell company={deal.company} />
+				<span className="min-w-0 text-muted-foreground">
+					<CompanyCell company={deal.company} />
+				</span>
 			</button>
 
 			<div className="flex items-center gap-2">
-				<span className="min-w-0 flex-1 truncate font-medium tabular-nums">
+				<span className="min-w-0 flex-1 truncate font-semibold text-sm tabular-nums">
 					{deal.amountCents === null
 						? null
 						: formatMoney(deal.amountCents, deal.currency)}

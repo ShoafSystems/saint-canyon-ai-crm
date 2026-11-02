@@ -96,7 +96,7 @@
 	--secondary: rgb(255 255 255 / 0.08);
 	--secondary-foreground: #f2f4ee;
 	--muted: rgb(255 255 255 / 0.06);
-	--muted-foreground: #b4b9ab;
+	--muted-foreground: #cdd2c4;
 	--accent: rgb(255 255 255 / 0.11);
 	--accent-foreground: #f2f4ee;
 	--tag: rgb(255 255 255 / 0.1);
@@ -117,7 +117,7 @@
 	--chart-2: #4b87f0;
 	--chart-3: #c07e22;
 	--chart-4: #9b7bf0;
-	--chart-5: #1e93b8;
+	--chart-5: #3fd8c8;
 	--severity-critical: oklch(0.637 0.237 25.331);
 	--severity-high: oklch(0.705 0.213 47.604);
 	--severity-medium: var(--chart-2);
@@ -140,7 +140,7 @@
 		-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
 		var(--font-geist-sans, "Geist"), system-ui, sans-serif;
 	--font-mono: var(--font-geist-mono, "Geist Mono", monospace);
-	--radius: 10px;
+	--radius: 12px;
 	--shadow-x: 0px;
 	--shadow-y: 1px;
 	--shadow-blur: 2px;
@@ -156,37 +156,62 @@
 	--shadow-xl: 0px 20px 48px -12px hsl(0 0% 0% / 0.55);
 	--shadow-2xl: 0px 28px 72px -16px hsl(0 0% 0% / 0.6);
 
-	/* Glass */
-	--glass-blur: blur(24px) saturate(170%);
-	--glass-blur-soft: blur(14px) saturate(150%);
-	--glass-edge: rgb(255 255 255 / 0.1);
-	--glass-highlight: inset 0 1px 0 0 rgb(255 255 255 / 0.07);
+	/* Glass: a white-tinted pane with a little smoke under it, so the colour
+	   behind shows through while text keeps its contrast. */
+	--glass-blur: blur(34px) saturate(175%);
+	--glass-blur-soft: blur(30px) saturate(165%);
+	--glass-fill: rgb(12 14 10 / 0.3);
+	--glass-sheen: linear-gradient(
+		165deg,
+		rgb(255 255 255 / 0.11) 0%,
+		rgb(255 255 255 / 0.055) 42%,
+		rgb(255 255 255 / 0.065) 100%
+	);
+	--glass-lane: rgb(255 255 255 / 0.025);
+	--glass-radius: 22px;
+	--glass-edge: rgb(255 255 255 / 0.12);
+	--glass-highlight: inset 0 1px 0 0 rgb(255 255 255 / 0.18);
 	--glass-depth:
-		0 1px 2px rgb(0 0 0 / 0.22), 0 14px 36px -14px rgb(0 0 0 / 0.6);
+		0 1px 2px rgb(0 0 0 / 0.18), 0 18px 40px -16px rgb(0 0 0 / 0.55);
 	--glass-float: 0 2px 8px rgb(0 0 0 / 0.3), 0 28px 64px -18px rgb(0 0 0 / 0.7);
-	--glass-chrome: rgb(14 16 12 / 0.55);
+	--glass-chrome: rgb(14 16 12 / 0.42);
+	--glass-warning: #f7b844;
+	--glass-warning-foreground: #241700;
+	/* Fine grain over the colour, which the blur in each pane smooths away. */
+	--glass-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .07 0 0 0 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 	--glass-backdrop:
+		var(--glass-grain),
 		radial-gradient(
-			48vmax 38vmax at 6% -6%,
-			rgb(150 196 44 / 0.26),
-			transparent 62%
+			40vmax 32vmax at 6% 2%,
+			rgb(197 240 74 / 0.34),
+			transparent 70%
 		),
 		radial-gradient(
-			42vmax 36vmax at 98% 4%,
-			rgb(32 136 116 / 0.22),
-			transparent 64%
+			40vmax 34vmax at 94% 16%,
+			rgb(20 184 166 / 0.44),
+			transparent 70%
 		),
 		radial-gradient(
-			52vmax 40vmax at 76% 104%,
-			rgb(196 128 44 / 0.16),
-			transparent 62%
+			44vmax 36vmax at 16% 98%,
+			rgb(124 58 237 / 0.6),
+			transparent 70%
 		),
 		radial-gradient(
-			40vmax 34vmax at 10% 100%,
-			rgb(116 74 150 / 0.16),
-			transparent 64%
+			40vmax 34vmax at 88% 90%,
+			rgb(245 158 11 / 0.42),
+			transparent 70%
 		),
-		linear-gradient(160deg, #10130d 0%, #0b0d0a 55%, #0d0f0b 100%);
+		radial-gradient(
+			34vmax 26vmax at 50% 40%,
+			rgb(197 240 74 / 0.22),
+			transparent 70%
+		),
+		radial-gradient(
+			30vmax 26vmax at 70% 64%,
+			rgb(124 58 237 / 0.3),
+			transparent 70%
+		),
+		linear-gradient(160deg, #0d100b 0%, #0a0c09 55%, #0c0d0b 100%);
 }
 
 /*
@@ -203,6 +228,9 @@
 		--popover: #1d2019;
 		--sidebar: #161914;
 		--glass-chrome: #121410;
+		--glass-fill: #1b1e18;
+		--glass-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
+		--glass-lane: #121410;
 		--glass-blur: none;
 		--glass-blur-soft: none;
 	}
@@ -214,6 +242,9 @@
 		--popover: #1d2019;
 		--sidebar: #161914;
 		--glass-chrome: #121410;
+		--glass-fill: #1b1e18;
+		--glass-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
+		--glass-lane: #121410;
 		--overlay: rgb(4 6 3 / 0.75);
 		--glass-blur: none;
 		--glass-blur-soft: none;
@@ -358,23 +389,50 @@
  * data-slot, so pages opt in by using the components rather than classes.
  */
 @layer utilities {
-	/* Panels: cards, KPI strips, charts, tables, board columns. */
+	/* Panels: cards, KPI cells, charts, tables, deal cards, the sign-in card. */
 	.dark
 	:is(
 		[data-slot="card-content"],
 		[data-slot="card-panel"],
-		[data-slot="stat-group"],
+		[data-slot="stat-card"],
 		[data-slot="chart-card"],
 		[data-slot="kpi-card"],
 		[data-slot="table-container"].bg-card,
 		[data-slot="auth-card"]
-	) {
-		border-color: var(--glass-edge);
-		border-radius: var(--radius-xl);
-		background-color: var(--card);
+	),
+	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"] {
+		border: 1px solid var(--glass-edge);
+		border-radius: var(--glass-radius);
+		background-color: var(--glass-fill);
+		background-image: var(--glass-sheen);
 		box-shadow: var(--glass-highlight), var(--glass-depth);
 		-webkit-backdrop-filter: var(--glass-blur-soft);
 		backdrop-filter: var(--glass-blur-soft);
+	}
+	.dark [data-slot="auth-card"] {
+		border-radius: 28px;
+		-webkit-backdrop-filter: var(--glass-blur);
+		backdrop-filter: var(--glass-blur);
+	}
+
+	/* No box-in-box: the KPI strip and the board columns are bare lanes, and
+	   the cells and deal cards inside them are the glass. */
+	.dark [data-slot="stat-group"] {
+		overflow: visible;
+		border: 0;
+		background: none;
+	}
+	.dark [data-slot="stat-group"] > div {
+		gap: 12px;
+	}
+	.dark [data-slot="deals-board-column"] [data-slot="card-panel"] {
+		border-color: transparent;
+		border-radius: calc(var(--glass-radius) + 4px);
+		background-color: var(--glass-lane);
+		background-image: none;
+		box-shadow: none;
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
 	}
 
 	/* Floating layers: menus, popovers, tooltips, dialogs, sheets. */
@@ -464,10 +522,22 @@
 		height: 40px;
 		border-radius: 9999px;
 	}
+	.dark [data-slot="app-rail"] [data-slot="button"]:not([aria-current="page"]) {
+		color: rgb(242 244 238 / 0.86);
+	}
 	.dark [data-slot="app-rail"] [aria-current="page"] {
 		background-color: var(--primary);
 		color: var(--primary-foreground);
 		box-shadow: 0 4px 14px -4px rgb(197 240 74 / 0.55);
+	}
+
+	/* Pill controls: buttons, fields and selects (joined button groups keep
+	   their own shape). */
+	.dark [data-slot="button"]:not([data-slot="button-group"] *),
+	.dark [data-slot="select-trigger"],
+	.dark [data-slot="input-group"],
+	.dark [data-slot="input"]:not([data-slot="input-group"] *) {
+		border-radius: 9999px;
 	}
 
 	/* Pill navigation: segmented tabs and toggle groups. */
@@ -485,6 +555,19 @@
 	}
 	.dark [data-slot="toggle-group"][data-spacing="0"] {
 		border-radius: 9999px;
+		padding: 2px;
+		border: 1px solid var(--glass-edge);
+		background-color: rgb(255 255 255 / 0.06);
+		box-shadow: var(--glass-highlight);
+		-webkit-backdrop-filter: var(--glass-blur-soft);
+		backdrop-filter: var(--glass-blur-soft);
+	}
+	.dark
+		[data-slot="toggle-group"][data-spacing="0"]
+		> [data-slot="toggle-group-item"] {
+		border-radius: 9999px;
+		border-color: transparent;
+		color: rgb(242 244 238 / 0.86);
 	}
 	.dark
 		[data-slot="toggle-group"][data-spacing="0"]
@@ -500,10 +583,17 @@
 		border-end-end-radius: 9999px;
 		padding-inline-end: 12px;
 	}
-	.dark [data-slot="toggle-group-item"][data-state="on"] {
+	/* One accent: whatever is selected is lime, like the active rail item. */
+	.dark
+		[data-slot="toggle-group"]
+		> [data-slot="toggle-group-item"][data-state="on"],
+	.dark
+		[data-slot="tabs-list"][data-variant="default"]
+		[data-slot="tabs-trigger"][data-state="active"] {
 		border-color: var(--primary);
-		background-color: color-mix(in oklab, var(--primary) 16%, transparent);
-		color: var(--foreground);
+		background-color: var(--primary);
+		color: var(--primary-foreground);
+		box-shadow: 0 4px 14px -6px rgb(197 240 74 / 0.6);
 	}
 
 	/* Tables read as rows on glass; the sticky header stays legible. */
@@ -514,18 +604,39 @@
 		background-color: rgb(255 255 255 / 0.05);
 	}
 
-	/* Deals board: glass columns holding lighter glass cards. */
+	/* Deals board: bare lanes of glass cards; radius = lane radius - padding. */
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"] {
-		border-color: var(--glass-edge);
-		border-radius: var(--radius-lg);
-		background-color: rgb(255 255 255 / 0.06);
-		box-shadow: var(--glass-highlight);
+		border-radius: calc(var(--glass-radius) - 4px);
 		transition:
-			background-color 160ms ease,
+			border-color 160ms ease,
 			transform 160ms ease;
 	}
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"]:hover {
-		background-color: rgb(255 255 255 / 0.09);
+		border-color: rgb(255 255 255 / 0.2);
+	}
+	.dark [data-slot="deals-board-column"] [data-slot="card-action"] > span {
+		border-radius: 9999px;
+		padding: 1px 8px;
+		background-color: rgb(255 255 255 / 0.12);
+		color: var(--foreground);
+		font-weight: 500;
+	}
+	.dark [data-slot="deals-board-column"] [data-slot="card-title"] {
+		font-size: 14px;
+		font-weight: 600;
+	}
+	.dark
+		[data-slot="deals-board-column"]
+		[data-slot="card-panel-detail"]
+		[data-slot="button"] {
+		color: rgb(242 244 238 / 0.82);
+	}
+	.dark
+		[data-slot="deals-board-column"]
+		[data-slot="card-panel-detail"]
+		[data-slot="button"]:is(:hover, :focus-visible) {
+		background-color: rgb(255 255 255 / 0.14);
+		color: var(--foreground);
 	}
 
 	/* Fields sit in the glass instead of punching dark holes in it (ghost
@@ -547,8 +658,8 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"] {
-		background-color: #23271f;
+	.dark [data-slot="toggle-group"][data-spacing="0"] {
+		background-color: #1b1e18;
 	}
 	.dark [data-slot="table-container"] [data-slot="table-head"] {
 		background-color: #1b1e18;
