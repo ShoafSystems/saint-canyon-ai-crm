@@ -218,6 +218,8 @@ function AreaTrend({
 	bloom = "low",
 	dashed = [],
 	formatY,
+	curve = "monotone",
+	dots = false,
 }: CartesianProps & {
 	stacked?: boolean;
 	variant?: DitherVariant;
@@ -226,6 +228,9 @@ function AreaTrend({
 	dashed?: string[];
 	/** Shows a value axis, labelled with this formatter. */
 	formatY?: (value: number) => string;
+	curve?: "monotone" | "linear";
+	/** Marks every data point, so a series flat on zero still shows. */
+	dots?: boolean;
 }) {
 	const keys = seriesKeys(config, series);
 	const gradientId = React.useId().replace(/:/g, "");
@@ -238,7 +243,10 @@ function AreaTrend({
 			className={cn("aspect-auto w-full", className)}
 			style={{ height }}
 		>
-			<AreaChart data={data} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+			<AreaChart
+				data={data}
+				margin={{ left: 0, right: formatY ? 20 : 0, top: 10, bottom: 0 }}
+			>
 				<defs>
 					{keys.map((key) => (
 						<linearGradient
@@ -287,7 +295,7 @@ function AreaTrend({
 					<Area
 						key={key}
 						dataKey={key}
-						type="monotone"
+						type={curve}
 						stroke={`var(--color-${key})`}
 						strokeWidth={2}
 						strokeDasharray={dashed.includes(key) ? "6 4" : undefined}
@@ -295,8 +303,12 @@ function AreaTrend({
 							dashed.includes(key) ? "none" : `url(#${gradientId}-${key})`
 						}
 						stackId={stacked ? "stack" : undefined}
-						dot={false}
-						activeDot={{ r: 3, strokeWidth: 0 }}
+						dot={
+							dots
+								? { r: 3, strokeWidth: 0, fill: `var(--color-${key})` }
+								: false
+						}
+						activeDot={{ r: dots ? 4 : 3, strokeWidth: 0 }}
 						style={
 							bloom === "off"
 								? undefined
@@ -309,7 +321,7 @@ function AreaTrend({
 							<Area
 								key={`dither-${key}`}
 								dataKey={key}
-								type="monotone"
+								type={curve}
 								stroke="none"
 								fill={`url(#${ditherPatternId(gradientId, key)})`}
 								fillOpacity={1}

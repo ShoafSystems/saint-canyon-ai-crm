@@ -89,14 +89,14 @@
 	--foreground: #f2f4ee;
 	--card: rgb(30 34 27 / 0.58);
 	--card-foreground: #f2f4ee;
-	--popover: rgb(24 27 21 / 0.8);
+	--popover: rgb(18 20 24 / 0.74);
 	--popover-foreground: #f2f4ee;
 	--primary: #c5f04a;
 	--primary-foreground: #131807;
 	--secondary: rgb(255 255 255 / 0.08);
 	--secondary-foreground: #f2f4ee;
 	--muted: rgb(255 255 255 / 0.06);
-	--muted-foreground: #cdd2c4;
+	--muted-foreground: #d6dbcd;
 	--accent: rgb(255 255 255 / 0.11);
 	--accent-foreground: #f2f4ee;
 	--tag: rgb(255 255 255 / 0.1);
@@ -135,9 +135,12 @@
 	--sidebar-accent-foreground: #f2f4ee;
 	--sidebar-border: rgb(255 255 255 / 0.1);
 	--sidebar-ring: #c5f04a;
-	/* SF on Apple platforms, Geist everywhere else. */
+	/* SF on Apple platforms, then Inter if installed, then Geist. */
 	--font-sans:
 		-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+		"Inter", var(--font-geist-sans, "Geist"), system-ui, sans-serif;
+	--font-display:
+		-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter",
 		var(--font-geist-sans, "Geist"), system-ui, sans-serif;
 	--font-mono: var(--font-geist-mono, "Geist Mono", monospace);
 	--radius: 12px;
@@ -156,62 +159,105 @@
 	--shadow-xl: 0px 20px 48px -12px hsl(0 0% 0% / 0.55);
 	--shadow-2xl: 0px 28px 72px -16px hsl(0 0% 0% / 0.6);
 
-	/* Glass: a white-tinted pane with a little smoke under it, so the colour
-	   behind shows through while text keeps its contrast. */
-	--glass-blur: blur(34px) saturate(175%);
-	--glass-blur-soft: blur(30px) saturate(165%);
-	--glass-fill: rgb(12 14 10 / 0.3);
-	--glass-sheen: linear-gradient(
-		165deg,
-		rgb(255 255 255 / 0.11) 0%,
-		rgb(255 255 255 / 0.055) 42%,
-		rgb(255 255 255 / 0.065) 100%
+	/* Glass: a thin white pane over a light smoke scrim, lit from the top
+	   left. The scrim (background-color) keeps text at AA; the tint and the
+	   diagonal sheen (background-image) are what reads as glass. Three
+	   layers: chrome (top bar, rail) is the clearest and floats highest,
+	   panels (cards) sit under it, and controls inside are a brighter wash. */
+	--glass-blur: blur(30px) saturate(190%);
+	--glass-blur-soft: blur(24px) saturate(180%);
+	--glass-fill: rgb(10 12 16 / 0.26);
+	--glass-sheen:
+		linear-gradient(
+			118deg,
+			transparent 30%,
+			rgb(255 255 255 / 0.045) 44%,
+			transparent 58%
+		),
+		linear-gradient(
+			160deg,
+			rgb(255 255 255 / 0.15) 0%,
+			rgb(255 255 255 / 0.085) 34%,
+			rgb(255 255 255 / 0.07) 100%
+		);
+	--glass-chrome: rgb(10 12 16 / 0.18);
+	--glass-chrome-sheen: linear-gradient(
+		180deg,
+		rgb(255 255 255 / 0.16) 0%,
+		rgb(255 255 255 / 0.1) 100%
 	);
-	--glass-lane: rgb(255 255 255 / 0.025);
+	--glass-control: rgb(255 255 255 / 0.1);
+	--glass-control-hover: rgb(255 255 255 / 0.16);
+	--glass-lane: rgb(255 255 255 / 0.03);
 	--glass-radius: 22px;
-	--glass-edge: rgb(255 255 255 / 0.12);
-	--glass-highlight: inset 0 1px 0 0 rgb(255 255 255 / 0.18);
+	/* The rim: bright where the light hits (top / top-left), nearly gone at
+	   the bottom, with a faint bounce on the lower right. */
+	--glass-edge: rgb(255 255 255 / 0.14);
+	--glass-rim: linear-gradient(
+		160deg,
+		rgb(255 255 255 / 0.3) 0%,
+		rgb(255 255 255 / 0.12) 28%,
+		rgb(255 255 255 / 0.04) 62%,
+		rgb(255 255 255 / 0.04) 86%,
+		rgb(255 255 255 / 0.1) 100%
+	);
+	--glass-highlight:
+		inset 0 1px 0 0 rgb(255 255 255 / 0.22),
+		inset 0 -1px 0 0 rgb(255 255 255 / 0.03);
 	--glass-depth:
-		0 1px 2px rgb(0 0 0 / 0.18), 0 18px 40px -16px rgb(0 0 0 / 0.55);
-	--glass-float: 0 2px 8px rgb(0 0 0 / 0.3), 0 28px 64px -18px rgb(0 0 0 / 0.7);
-	--glass-chrome: rgb(14 16 12 / 0.42);
+		0 1px 1px rgb(0 0 0 / 0.12), 0 10px 24px -12px rgb(0 0 0 / 0.45),
+		0 24px 48px -24px rgb(0 0 0 / 0.5);
+	--glass-float:
+		0 2px 6px rgb(0 0 0 / 0.22), 0 20px 44px -14px rgb(0 0 0 / 0.55),
+		0 40px 80px -32px rgb(0 0 0 / 0.55);
+	/* Selected states are tinted glass lime; solid lime is the primary CTA only. */
+	--glass-active: rgb(197 240 74 / 0.2);
+	--glass-active-edge: rgb(214 247 120 / 0.5);
+	--glass-active-foreground: #eaffb4;
 	--glass-warning: #f7b844;
 	--glass-warning-foreground: #241700;
 	/* Fine grain over the colour, which the blur in each pane smooths away. */
-	--glass-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .07 0 0 0 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+	--glass-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .085 0 0 0 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+	/* Lime, teal and violet, with amber as one small warm accent. The centre
+	   blobs sit behind the content column so every pane has colour to frost. */
 	--glass-backdrop:
 		var(--glass-grain),
 		radial-gradient(
-			40vmax 32vmax at 6% 2%,
-			rgb(197 240 74 / 0.34),
+			38vmax 30vmax at 8% 0%,
+			rgb(197 240 74 / 0.42),
 			transparent 70%
 		),
 		radial-gradient(
-			40vmax 34vmax at 94% 16%,
-			rgb(20 184 166 / 0.44),
+			40vmax 34vmax at 96% 12%,
+			rgb(20 184 166 / 0.55),
 			transparent 70%
 		),
 		radial-gradient(
-			44vmax 36vmax at 16% 98%,
+			46vmax 38vmax at 12% 100%,
 			rgb(124 58 237 / 0.6),
 			transparent 70%
 		),
 		radial-gradient(
-			40vmax 34vmax at 88% 90%,
-			rgb(245 158 11 / 0.42),
+			22vmax 18vmax at 92% 96%,
+			rgb(245 158 11 / 0.3),
 			transparent 70%
 		),
 		radial-gradient(
-			34vmax 26vmax at 50% 40%,
-			rgb(197 240 74 / 0.22),
-			transparent 70%
+			36vmax 26vmax at 48% 34%,
+			rgb(45 212 191 / 0.3),
+			transparent 72%
 		),
 		radial-gradient(
-			30vmax 26vmax at 70% 64%,
-			rgb(124 58 237 / 0.3),
-			transparent 70%
+			34vmax 28vmax at 62% 72%,
+			rgb(139 92 246 / 0.42),
+			transparent 72%
 		),
-		linear-gradient(160deg, #0d100b 0%, #0a0c09 55%, #0c0d0b 100%);
+		radial-gradient(
+			28vmax 22vmax at 30% 56%,
+			rgb(197 240 74 / 0.2),
+			transparent 72%
+		),
+		linear-gradient(160deg, #10140f 0%, #0c0e12 55%, #0e0c14 100%);
 }
 
 /*
@@ -230,6 +276,10 @@
 		--glass-chrome: #121410;
 		--glass-fill: #1b1e18;
 		--glass-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
+		--glass-chrome-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
+		--glass-control: #262a22;
+		--glass-control-hover: #30352b;
+		--glass-active: #2e3a14;
 		--glass-lane: #121410;
 		--glass-blur: none;
 		--glass-blur-soft: none;
@@ -244,6 +294,10 @@
 		--glass-chrome: #121410;
 		--glass-fill: #1b1e18;
 		--glass-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
+		--glass-chrome-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
+		--glass-control: #262a22;
+		--glass-control-hover: #30352b;
+		--glass-active: #2e3a14;
 		--glass-lane: #121410;
 		--overlay: rgb(4 6 3 / 0.75);
 		--glass-blur: none;
@@ -401,7 +455,8 @@
 		[data-slot="auth-card"]
 	),
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"] {
-		border: 1px solid var(--glass-edge);
+		position: relative;
+		border: 0;
 		border-radius: var(--glass-radius);
 		background-color: var(--glass-fill);
 		background-image: var(--glass-sheen);
@@ -409,8 +464,42 @@
 		-webkit-backdrop-filter: var(--glass-blur-soft);
 		backdrop-filter: var(--glass-blur-soft);
 	}
+	/* The rim is a 1px ring masked out of a gradient, so the edge catches the
+	   light at the top left and fades out towards the bottom. */
+	.dark
+		:is(
+			[data-slot="card-content"],
+			[data-slot="card-panel"],
+			[data-slot="stat-card"],
+			[data-slot="chart-card"],
+			[data-slot="kpi-card"],
+			[data-slot="table-container"].bg-card,
+			[data-slot="auth-card"],
+			[data-slot="app-header"],
+			[data-slot="app-rail"]
+		)::before,
+	.dark
+		[data-slot="deals-board-column"]
+		[data-slot="card-panel-detail"]::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		border-radius: inherit;
+		padding: 1px;
+		background: var(--glass-rim);
+		-webkit-mask:
+			linear-gradient(#000 0 0) content-box,
+			linear-gradient(#000 0 0);
+		-webkit-mask-composite: xor;
+		mask:
+			linear-gradient(#000 0 0) content-box exclude,
+			linear-gradient(#000 0 0);
+		pointer-events: none;
+	}
 	.dark [data-slot="auth-card"] {
-		border-radius: 28px;
+		border-radius: 30px;
+		box-shadow: var(--glass-highlight), var(--glass-float);
 		-webkit-backdrop-filter: var(--glass-blur);
 		backdrop-filter: var(--glass-blur);
 	}
@@ -426,13 +515,22 @@
 		gap: 12px;
 	}
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel"] {
-		border-color: transparent;
 		border-radius: calc(var(--glass-radius) + 4px);
 		background-color: var(--glass-lane);
 		background-image: none;
-		box-shadow: none;
+		box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
 		-webkit-backdrop-filter: none;
 		backdrop-filter: none;
+	}
+	.dark [data-slot="deals-board-column"] [data-slot="card-panel"]::before {
+		opacity: 0.35;
+	}
+
+	/* An empty panel says so in the middle of the pane. */
+	.dark [data-slot="card-panel-empty"] {
+		min-height: 120px;
+		color: rgb(242 244 238 / 0.82);
+		font-size: 13px;
 	}
 
 	/* Floating layers: menus, popovers, tooltips, dialogs, sheets. */
@@ -448,6 +546,7 @@
 		[data-slot="sheet-content"]
 	) {
 		background-color: var(--popover);
+		background-image: var(--glass-sheen);
 		box-shadow: var(--glass-highlight), var(--glass-float);
 		-webkit-backdrop-filter: var(--glass-blur);
 		backdrop-filter: var(--glass-blur);
@@ -479,6 +578,7 @@
 			right: 10px;
 			height: auto;
 			border: 1px solid var(--glass-edge);
+			border-top-color: rgb(255 255 255 / 0.26);
 			border-radius: calc(var(--radius-xl) + 4px);
 			overflow: hidden;
 		}
@@ -491,16 +591,27 @@
 		backdrop-filter: blur(6px) saturate(120%);
 	}
 
-	/* App chrome: a floating top bar and a pill icon rail. */
+	/* App chrome: the clearest, highest layer — a floating top bar and a
+	   pill icon rail. */
+	.dark :is([data-slot="app-header"], [data-slot="app-rail"]) {
+		position: relative;
+	}
 	.dark [data-slot="app-header"] {
 		margin: 10px 12px 0;
-		border: 1px solid var(--glass-edge);
+		border: 0;
 		border-radius: 9999px;
 		padding-inline: 8px;
 		background-color: var(--glass-chrome);
-		box-shadow: var(--glass-highlight), var(--glass-depth);
+		background-image: var(--glass-chrome-sheen);
+		box-shadow: var(--glass-highlight), var(--glass-float);
 		-webkit-backdrop-filter: var(--glass-blur);
 		backdrop-filter: var(--glass-blur);
+	}
+	.dark [data-slot="app-rail"] {
+		border: 0;
+	}
+	.dark [data-slot="app-rail"]::before {
+		display: none;
 	}
 	@media (min-width: 768px) {
 		.dark [data-slot="app-rail"] {
@@ -508,13 +619,16 @@
 			width: 56px;
 			margin: 16px 0 16px 12px;
 			gap: 6px;
-			border: 1px solid var(--glass-edge);
 			border-radius: 9999px;
 			padding-block: 8px;
 			background-color: var(--glass-chrome);
+			background-image: var(--glass-chrome-sheen);
 			box-shadow: var(--glass-highlight), var(--glass-float);
 			-webkit-backdrop-filter: var(--glass-blur);
 			backdrop-filter: var(--glass-blur);
+		}
+		.dark [data-slot="app-rail"]::before {
+			display: block;
 		}
 	}
 	.dark [data-slot="app-rail"] [data-slot="button"] {
@@ -524,11 +638,6 @@
 	}
 	.dark [data-slot="app-rail"] [data-slot="button"]:not([aria-current="page"]) {
 		color: rgb(242 244 238 / 0.86);
-	}
-	.dark [data-slot="app-rail"] [aria-current="page"] {
-		background-color: var(--primary);
-		color: var(--primary-foreground);
-		box-shadow: 0 4px 14px -4px rgb(197 240 74 / 0.55);
 	}
 
 	/* Pill controls: buttons, fields and selects (joined button groups keep
@@ -540,12 +649,74 @@
 		border-radius: 9999px;
 	}
 
+	/* Controls are the third layer: a brighter wash of the same glass with
+	   its own top highlight — secondary buttons, chips, badges, initials. */
+	.dark
+		[data-slot="button"]:is(
+			[data-variant="outline"],
+			[data-variant="secondary"],
+			[data-variant="contrast"]
+		),
+	.dark [data-slot="select-trigger"],
+	.dark
+		[data-slot="badge"]:is(
+			[data-variant="secondary"],
+			[data-variant="outline"],
+			[data-variant="token"]
+		),
+	.dark [data-slot="avatar-fallback"],
+	.dark [data-slot="entity-logo"].bg-muted {
+		border-color: rgb(255 255 255 / 0.1);
+		border-top-color: rgb(255 255 255 / 0.22);
+		background-color: var(--glass-control);
+		background-image: linear-gradient(
+			180deg,
+			rgb(255 255 255 / 0.06),
+			transparent
+		);
+		color: var(--foreground);
+		box-shadow:
+			inset 0 1px 0 0 rgb(255 255 255 / 0.1),
+			0 1px 2px rgb(0 0 0 / 0.2);
+		-webkit-backdrop-filter: blur(16px) saturate(180%);
+		backdrop-filter: blur(16px) saturate(180%);
+	}
+	.dark [data-slot="avatar-fallback"],
+	.dark [data-slot="entity-logo"].bg-muted {
+		border: 1px solid rgb(255 255 255 / 0.12);
+		border-top-color: rgb(255 255 255 / 0.24);
+		font-weight: 600;
+	}
+	.dark [data-slot="entity-logo"].bg-muted {
+		border-radius: 9999px;
+	}
+	.dark
+		[data-slot="button"]:is(
+			[data-variant="outline"],
+			[data-variant="secondary"],
+			[data-variant="contrast"]
+		):is(:hover, [aria-expanded="true"]),
+	.dark [data-slot="select-trigger"]:hover {
+		background-color: var(--glass-control-hover);
+		color: var(--foreground);
+	}
+	/* The primary action is the only solid lime. */
+	.dark [data-slot="button"][data-variant="default"] {
+		box-shadow:
+			inset 0 1px 0 0 rgb(255 255 255 / 0.45),
+			0 6px 18px -8px rgb(197 240 74 / 0.7);
+	}
+
 	/* Pill navigation: segmented tabs and toggle groups. */
 	.dark [data-slot="tabs-list"][data-variant="default"] {
 		height: 34px;
-		border: 1px solid var(--glass-edge);
+		border: 1px solid rgb(255 255 255 / 0.1);
+		border-top-color: rgb(255 255 255 / 0.2);
 		border-radius: 9999px;
-		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
+		background-color: var(--glass-control);
+		box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.08);
+		-webkit-backdrop-filter: blur(16px) saturate(180%);
+		backdrop-filter: blur(16px) saturate(180%);
 	}
 	.dark
 		[data-slot="tabs-list"][data-variant="default"]
@@ -556,11 +727,14 @@
 	.dark [data-slot="toggle-group"][data-spacing="0"] {
 		border-radius: 9999px;
 		padding: 2px;
-		border: 1px solid var(--glass-edge);
-		background-color: rgb(255 255 255 / 0.06);
-		box-shadow: var(--glass-highlight);
-		-webkit-backdrop-filter: var(--glass-blur-soft);
-		backdrop-filter: var(--glass-blur-soft);
+		border: 1px solid rgb(255 255 255 / 0.1);
+		border-top-color: rgb(255 255 255 / 0.2);
+		background-color: var(--glass-control);
+		box-shadow:
+			inset 0 1px 0 0 rgb(255 255 255 / 0.08),
+			0 1px 2px rgb(0 0 0 / 0.2);
+		-webkit-backdrop-filter: blur(16px) saturate(180%);
+		backdrop-filter: blur(16px) saturate(180%);
 	}
 	.dark
 		[data-slot="toggle-group"][data-spacing="0"]
@@ -583,22 +757,31 @@
 		border-end-end-radius: 9999px;
 		padding-inline-end: 12px;
 	}
-	/* One accent: whatever is selected is lime, like the active rail item. */
+	/* Selected is tinted lime glass, the same on toggles, tabs and the rail. */
 	.dark
 		[data-slot="toggle-group"]
 		> [data-slot="toggle-group-item"][data-state="on"],
 	.dark
 		[data-slot="tabs-list"][data-variant="default"]
-		[data-slot="tabs-trigger"][data-state="active"] {
-		border-color: var(--primary);
-		background-color: var(--primary);
-		color: var(--primary-foreground);
-		box-shadow: 0 4px 14px -6px rgb(197 240 74 / 0.6);
+		[data-slot="tabs-trigger"][data-state="active"],
+	.dark [data-slot="app-rail"] [aria-current="page"] {
+		border-color: transparent;
+		background-color: var(--glass-active);
+		background-image: linear-gradient(
+			180deg,
+			rgb(255 255 255 / 0.12),
+			transparent 70%
+		);
+		color: var(--glass-active-foreground);
+		box-shadow:
+			inset 0 0 0 1px var(--glass-active-edge),
+			inset 0 1px 0 0 rgb(255 255 255 / 0.3),
+			0 4px 16px -6px rgb(197 240 74 / 0.45);
 	}
 
 	/* Tables read as rows on glass; the sticky header stays legible. */
 	.dark [data-slot="table-container"] [data-slot="table-head"] {
-		background-color: rgb(26 30 23 / 0.9);
+		background-color: rgb(22 25 28 / 0.86);
 	}
 	.dark [data-slot="table-row"]:hover {
 		background-color: rgb(255 255 255 / 0.05);
@@ -608,16 +791,17 @@
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"] {
 		border-radius: calc(var(--glass-radius) - 4px);
 		transition:
-			border-color 160ms ease,
+			box-shadow 160ms ease,
 			transform 160ms ease;
 	}
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"]:hover {
-		border-color: rgb(255 255 255 / 0.2);
+		box-shadow: var(--glass-highlight), var(--glass-float);
 	}
 	.dark [data-slot="deals-board-column"] [data-slot="card-action"] > span {
 		border-radius: 9999px;
 		padding: 1px 8px;
-		background-color: rgb(255 255 255 / 0.12);
+		background-color: var(--glass-control);
+		box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.12);
 		color: var(--foreground);
 		font-weight: 500;
 	}
@@ -635,14 +819,14 @@
 		[data-slot="deals-board-column"]
 		[data-slot="card-panel-detail"]
 		[data-slot="button"]:is(:hover, :focus-visible) {
-		background-color: rgb(255 255 255 / 0.14);
+		background-color: var(--glass-control-hover);
 		color: var(--foreground);
 	}
 
 	/* Fields sit in the glass instead of punching dark holes in it (ghost
 	   fields keep their own transparent background). */
 	.dark :is([data-slot="input"], [data-slot="textarea"]).bg-background {
-		background-color: rgb(255 255 255 / 0.05);
+		background-color: rgb(255 255 255 / 0.06);
 	}
 
 	/* Programmatic focus on an opened layer gets a quiet edge, not the accent. */
@@ -658,11 +842,11 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-	.dark [data-slot="toggle-group"][data-spacing="0"] {
-		background-color: #1b1e18;
-	}
 	.dark [data-slot="table-container"] [data-slot="table-head"] {
 		background-color: #1b1e18;
+	}
+	.dark [data-slot="demo-banner"][data-variant="strip"] {
+		background: #3a2c0c;
 	}
 }
 

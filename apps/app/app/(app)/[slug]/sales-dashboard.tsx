@@ -25,11 +25,11 @@ import { useWorkspaceUrl } from "@/lib/use-workspace-url";
 
 type Summary = RouterOutputs["dashboard"]["summary"];
 
-// Closed won wears the closed-stage colour (see dealStageColor), dashed, and
-// is drawn last so the pipeline fill never hides it.
+// Teal and white, so neither series reads as the lime brand accent. Closed
+// won is dashed and drawn last so the pipeline fill never hides it.
 const TREND_CONFIG: ChartConfig = {
-	created: { label: "New pipeline", color: "var(--chart-1)" },
-	won: { label: "Closed won", color: "var(--chart-5)" },
+	created: { label: "New pipeline", color: "var(--chart-5)" },
+	won: { label: "Closed won", color: "var(--foreground)" },
 };
 
 function changeDelta(
@@ -65,6 +65,7 @@ export function SalesDashboard({ summary }: { summary: Summary }) {
 		formatMoney(Number(value), reportingCurrency);
 
 	const hasTrend = trend.some((point) => point.won > 0 || point.created > 0);
+	const hasWins = trend.some((point) => point.won > 0);
 
 	const stageSlices = pipeline.stages.flatMap((stage) =>
 		stage.valueCents > 0
@@ -84,7 +85,7 @@ export function SalesDashboard({ summary }: { summary: Summary }) {
 		<div className="flex flex-col gap-6">
 			<StatGroup>
 				<StatCard
-					label="Closed won this month"
+					label="Closed won (MTD)"
 					value={money(wonThisMonth.valueCents)}
 					delta={changeDelta(
 						wonThisMonth.valueCents,
@@ -150,19 +151,26 @@ export function SalesDashboard({ summary }: { summary: Summary }) {
 					description="Last six months, by the month a deal closed or was created"
 				>
 					{hasTrend ? (
-						<div className="flex flex-1 flex-col justify-center py-4">
+						<div className="flex flex-1 flex-col gap-1 pt-4 pb-3">
 							<AreaTrend
 								data={trend}
 								config={TREND_CONFIG}
 								xKey="month"
-								height={196}
+								height={252}
+								curve="linear"
+								dots
 								variant="gradient"
-								bloom="high"
+								bloom="low"
 								showLegend
 								dashed={["won"]}
 								formatY={money}
 								formatValue={exact}
 							/>
+							{hasWins ? null : (
+								<p className="text-center text-muted-foreground text-xs">
+									No closed-won yet
+								</p>
+							)}
 						</div>
 					) : (
 						<EmptyChart label="No deals closed or created yet" />
