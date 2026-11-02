@@ -3,7 +3,8 @@ import { API_URL } from "@/lib/env";
 
 const DEMO_STATUS_TIMEOUT_MS = 2_000;
 
-export const DEMO_SIGN_IN_URL = `${API_URL}/demo/session`;
+// Same-origin: app/demo/session/route.ts forwards it to the API server-side.
+export const DEMO_SIGN_IN_URL = "/demo/session";
 
 const demoStatus = z
 	.object({ enabled: z.boolean().catch(false) })

@@ -55,7 +55,8 @@ APP_URL = f"http://127.0.0.1:{APP_PORT}"
 INTERNAL_API_URL = f"http://127.0.0.1:{API_PORT}"
 
 # Public demo instance (synthetic .test addresses only). The demo user signs
-# in as a member through POST /demo/session; the owner is seeded and never
+# in as a member through POST /demo/session on the app origin (the app
+# forwards it to the API in-pod); the owner is seeded and never
 # signs in. ALLOWED_SIGN_IN names exactly these two addresses. The agent stays
 # off: no ANTHROPIC_API_KEY here.
 DEMO_LOGIN_EMAIL = "demo@saint-canyon.test"
@@ -66,7 +67,9 @@ DEMO_ENV = {
     "DEMO_LOGIN_EMAIL": DEMO_LOGIN_EMAIL,
     "DEMO_SEED_OWNER_EMAIL": DEMO_SEED_OWNER_EMAIL,
     "ALLOWED_SIGN_IN": ALLOWED_SIGN_IN,
-    # One proxy hop (Tailscale Funnel) appends to X-Forwarded-For.
+    # Funnel -> app -> API. Funnel appends the client IP to X-Forwarded-For;
+    # the app's /demo/session route forwards the header unchanged and appends
+    # nothing, so exactly one hop appends.
     "TRUST_PROXY_HOPS": "1",
     "CRM_TELEMETRY_DISABLED": "1",
 }
