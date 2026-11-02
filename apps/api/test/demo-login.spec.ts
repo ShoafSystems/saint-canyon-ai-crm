@@ -33,7 +33,15 @@ const WORKSPACE = "workspace";
 type Store = {
 	users: { id: string; email: string }[];
 	members: Map<string, string>;
-	sessions: { token: string; userId: string; expiresAt: Date }[];
+	sessions: Session[];
+};
+
+type Session = {
+	token: string;
+	userId: string;
+	expiresAt: Date;
+	ipAddress: string | null;
+	userAgent: string | null;
 };
 
 function fakeDb(store: Store) {
@@ -66,11 +74,7 @@ function fakeDb(store: Store) {
 			},
 		},
 		session: {
-			create: async ({
-				data,
-			}: {
-				data: { token: string; userId: string; expiresAt: Date };
-			}) => {
+			create: async ({ data }: { data: Session }) => {
 				store.sessions.push(data);
 				return data;
 			},
@@ -144,6 +148,17 @@ describe("demo sign-in", () => {
 			.expect(404);
 	});
 
+	it("stays off when only the demo address's domain is allowed", async () => {
+		process.env.ALLOWED_SIGN_IN = "example.com,demo.example";
+
+		await request(app.getHttpServer())
+			.post("/demo/session")
+			.set("Origin", appOrigin)
+			.expect(404);
+		const status = await request(app.getHttpServer()).get("/demo").expect(200);
+		expect(status.body).toEqual({ enabled: false });
+	});
+
 	it("refuses a request from another origin", async () => {
 		await request(app.getHttpServer())
 			.post("/demo/session")
@@ -171,6 +186,8 @@ describe("demo sign-in", () => {
 
 		const session = store.sessions.at(-1);
 		expect(session?.userId).toBe(user?.id);
+		expect(session?.ipAddress).toBeNull();
+		expect(session?.userAgent).toBeNull();
 		const lifetime = (session?.expiresAt.getTime() ?? 0) - before;
 		expect(lifetime).toBeGreaterThan(2 * 60 * 60 * 1000 - 5000);
 		expect(lifetime).toBeLessThanOrEqual(2 * 60 * 60 * 1000 + 5000);

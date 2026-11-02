@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TRPCModule } from "nestjs-trpc";
+import { DemoGuardMiddleware } from "../demo/demo-guard.middleware";
 import { ContextLogger } from "../logging/context-logger";
 import { formatTrpcError } from "./error-formatter";
 import { AuthMiddleware } from "./middlewares/auth.middleware";
@@ -17,7 +18,11 @@ import { TrpcErrorHandler } from "./trpc-error.handler";
 			logger: new ContextLogger(),
 			errorFormatter: formatTrpcError,
 			onError: TrpcErrorHandler,
-			globalMiddlewares: [LoggingMiddleware, DomainErrorMiddleware],
+			globalMiddlewares: [
+				LoggingMiddleware,
+				DomainErrorMiddleware,
+				DemoGuardMiddleware,
+			],
 		}),
 	],
 	providers: [
@@ -25,6 +30,7 @@ import { TrpcErrorHandler } from "./trpc-error.handler";
 		TrpcErrorHandler,
 		LoggingMiddleware,
 		DomainErrorMiddleware,
+		DemoGuardMiddleware,
 		AuthMiddleware,
 		SessionOnlyMiddleware,
 	],
