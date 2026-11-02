@@ -24,3 +24,31 @@ test("money is formatted in one fixed locale", () => {
 
 	expect(seen.every((locales) => locales === "en-US")).toBe(true);
 });
+
+// Node resolves a compact currency minimum of 1 fraction digit where Chromium
+// and Bun resolve 0, so the server printed "$405.0K" and the browser "$405K"
+// on the overview's Open pipeline card. Any fraction maximum must come with an
+// explicit minimum, whichever engine runs this test.
+test("compact money never leaves the fraction minimum to the engine", () => {
+	const intl = Intl.NumberFormat;
+	const seen: Intl.NumberFormatOptions[] = [];
+	Intl.NumberFormat = function (
+		locales?: string | string[],
+		options?: Intl.NumberFormatOptions,
+	) {
+		seen.push(options ?? {});
+		return new intl(locales, options);
+	} as unknown as typeof Intl.NumberFormat;
+
+	try {
+		expect(formatMoneyCompact(40_500_000, "usd")).toBe("$405K");
+		expect(formatMoneyCompact(40_512_300, "usd")).toBe("$405.1K");
+		expect(formatMoneyCompact(6_300_000, "usd")).toBe("$63K");
+	} finally {
+		Intl.NumberFormat = intl;
+	}
+
+	for (const options of seen) {
+		expect(options.minimumFractionDigits).toBe(0);
+	}
+});

@@ -50,11 +50,14 @@ export function formatMoney(cents: number, currency = "usd"): string {
 	}).format(cents / 100);
 }
 
+// The minimum is explicit because engines disagree on its default for compact
+// currency: Node (the server) pads $405K to "$405.0K", Chromium and Bun do not.
 export function formatMoneyCompact(cents: number, currency = "usd"): string {
 	return new Intl.NumberFormat("en-US", {
 		style: "currency",
 		currency: displayCurrencyCode(currency),
 		notation: "compact",
+		minimumFractionDigits: 0,
 		maximumFractionDigits: cents % 100_000 === 0 ? 0 : 1,
 	}).format(cents / 100);
 }
