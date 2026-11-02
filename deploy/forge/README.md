@@ -90,6 +90,28 @@ Recreating the database drops the session rows, but that alone is not enough. Be
 
 Run it once right before switching the public link on, then nightly while the demo is public. This slice sets up no scheduler (see Scheduler). A nightly trigger is a separate decision, for example a systemd user timer that runs the command above. Every run interrupts sign-in for about a minute.
 
+Every step must succeed. If stopping a container, `dropdb`, `createdb`, migrate, seed or the revoke fails, the command stops there, before the secret is rotated or anything restarts. The api and app are left stopped, so a "reset" never comes back up on old or empty data. Fix the cause and run it again; it is safe to repeat.
+
+## Public demo: switching it off
+
+```
+python3 deploy/forge/stack.py disable-demo
+```
+
+Do not just edit `DEMO_LOGIN_ENABLED` by hand. A demo session can outlive the flag (2 hours, kept alive by the 5-minute cookie cache), and `disable-demo` ends it. It runs these steps in order:
+
+1. Stop the app and the API, so nothing is served while the rest changes.
+2. Set `DEMO_LOGIN_ENABLED=false` in `prod.env`.
+3. Rotate `BETTER_AUTH_SECRET`. Every cookie that was signed before is now void.
+4. Delete the demo user's sessions and API keys, and print the counts.
+5. Start the API and the app again.
+
+It stops at the first failure and leaves the api and app stopped. Because the stop comes first and the start comes last, the demo is never served unguarded at any point.
+
+There is a second line of defence. The guards (the Better Auth `demoGuard`, the tRPC `DemoGuardMiddleware` and the eve proxy) match the configured `DEMO_LOGIN_EMAIL` whether or not the flag is on. So a demo session that somehow survives still cannot mint keys, change settings or reach REST. Keep `DEMO_LOGIN_EMAIL` set while that account exists. The flag now controls only whether demo sign-in is offered and whether the UI shows demo hints.
+
+`up` and `secrets` reuse an existing `prod.env` as it is, so they never switch the demo back on. To turn it on again, run `demo-env` and then `reset-demo`.
+
 ## Not in this slice
 
 - The agent (`apps/agent`). Steel is doing the Anthropic provider swap in parallel.

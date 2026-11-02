@@ -3,15 +3,23 @@
 
 Usage: python3 deploy/forge/stack.py <command> [...]
 
-  secrets      generate the private env files once (never printed)
+  secrets      generate the private env files once (never printed); an
+               existing pair is reused untouched
   pod          create the loopback-only pod
   db           start Postgres 17
   migrate      prisma migrate deploy (one-off container)
   seed         load the sample data (one-off container)
-  demo-env     set the demo keys in an existing prod.env (secrets kept)
+  demo-env     set the demo keys in an existing prod.env (secrets kept);
+               this switches demo sign-in on
   reset-db     stop api/app, recreate the database, migrate, seed
   reset-demo   reset-db, rotate BETTER_AUTH_SECRET, revoke demo sessions and
                API keys, start api/app (before exposure, then nightly)
+  disable-demo stop api/app, set DEMO_LOGIN_ENABLED=false, rotate
+               BETTER_AUTH_SECRET, revoke demo sessions and API keys,
+               start api/app
+
+Every multi-step command stops at the first failed step; api and app are
+then left stopped rather than started on a half-done state.
   build-api    bun build -> apps/api/dist (no network)
   build-app    next build on Node 22, detached (no network); poll with `logs`
   api          start the API (bun dist/main.js)
@@ -90,12 +98,16 @@ LIMITS = {
 }
 
 
-def sh(cmd, timeout=160, quiet=False):
+def sh(cmd, timeout=160, quiet=False, check=False):
+    """Run a command. With check, a non-zero exit stops the script here, so
+    the steps after it (rotate, revoke, restart) never run on a failed one."""
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     if not quiet:
         print(f">> {' '.join(cmd[:3])} ... exit {r.returncode}")
         if r.returncode != 0:
             print(r.stderr[-1500:].strip())
+    if check and r.returncode != 0:
+        sys.exit(f"stopped: `{' '.join(cmd[:3])}` exited {r.returncode}; nothing after it ran")
     return r
 
 
@@ -110,8 +122,9 @@ def cmd_secrets():
     os.makedirs(PRIV, mode=0o700, exist_ok=True)
     os.chmod(PRIV, 0o700)
     if os.path.exists(APP_ENV) and os.path.exists(PG_ENV):
+        # Reused as they are: `up` must not switch a disabled demo back on.
+        # `demo-env` is the one command that enables it.
         print("private env files exist; reusing")
-        cmd_demo_env()
         return
     pg_password = secrets.token_hex(24)
     write_private(PG_ENV, [
@@ -134,12 +147,18 @@ def cmd_secrets():
     print("generated private env files (values not printed)")
 
 
-def cmd_demo_env():
-    """Set the demo keys in an existing prod.env, keeping its secrets."""
+def set_env(values):
+    """Replace these keys in prod.env, keeping every other line."""
     with open(APP_ENV) as f:
         lines = f.read().splitlines()
-    kept = [l for l in lines if l.split("=", 1)[0] not in DEMO_ENV]
-    write_private(APP_ENV, kept + [f"{k}={v}" for k, v in DEMO_ENV.items()])
+    kept = [l for l in lines if l.split("=", 1)[0] not in values]
+    write_private(APP_ENV, kept + [f"{k}={v}" for k, v in values.items()])
+
+
+def cmd_demo_env():
+    """Set the demo keys in an existing prod.env, keeping its secrets. This
+    switches demo sign-in on; restart the api and app to apply it."""
+    set_env(DEMO_ENV)
     print("prod.env demo keys set:", ", ".join(DEMO_ENV))
 
 
@@ -184,7 +203,8 @@ def cmd_db():
     sys.exit("postgres did not become ready")
 
 
-def oneoff(name, image, workdir, script, network="pod", detach=False, timeout=160, limits=()):
+def oneoff(name, image, workdir, script, network="pod", detach=False, timeout=160, limits=(),
+           check=False):
     sh(["podman", "rm", "-f", name], quiet=True)
     cmd = ["podman", "run", "--name", name, *limits]
     cmd += ["--pod", POD] if network == "pod" else ["--network", "none"]
@@ -195,28 +215,38 @@ def oneoff(name, image, workdir, script, network="pod", detach=False, timeout=16
     print(r.stdout[-4000:])
     if not detach:
         sh(["podman", "rm", "-f", name], quiet=True)
+    if check and r.returncode != 0:
+        sys.exit(f"stopped: {name} exited {r.returncode}; nothing after it ran")
     return r
 
 
 def cmd_migrate():
     oneoff("compai-prod-migrate", BUN_IMAGE, "packages/db",
-           "./node_modules/.bin/prisma migrate deploy")
+           "./node_modules/.bin/prisma migrate deploy", check=True)
 
 
 def cmd_seed():
     # The seed resolves favicons over the network; with DNS blackholed those
     # lookups fail fast and companies keep initials.
-    oneoff("compai-prod-seed", BUN_IMAGE, "packages/db", "bun prisma/seed.ts")
+    oneoff("compai-prod-seed", BUN_IMAGE, "packages/db", "bun prisma/seed.ts", check=True)
+
+
+def stop_services():
+    """Stop the app and API so nothing serves while the steps that follow run.
+    A container that does not exist is already not serving."""
+    for name in (APP, API):
+        if exists(name):
+            sh(["podman", "stop", "-t", "10", name], check=True)
 
 
 def cmd_reset_db():
     # Synthetic data only: stop the API and app, recreate the database, then
     # migrate and seed. prod.env carries DEMO_SEED_OWNER_EMAIL, so the seed
-    # adds the demo owner and hands the demo user its share of deals.
-    for name in (APP, API):
-        sh(["podman", "stop", "-t", "10", name])
-    sh(["podman", "exec", DB, "dropdb", "-U", "postgres", "--if-exists", "--force", "crm"])
-    sh(["podman", "exec", DB, "createdb", "-U", "postgres", "crm"])
+    # adds the demo owner and hands the demo user its share of deals. Every
+    # step must succeed; the first failure stops here with api/app stopped.
+    stop_services()
+    sh(["podman", "exec", DB, "dropdb", "-U", "postgres", "--if-exists", "--force", "crm"], check=True)
+    sh(["podman", "exec", DB, "createdb", "-U", "postgres", "crm"], check=True)
     cmd_migrate()
     cmd_seed()
 
@@ -245,14 +275,33 @@ def rotate_auth_secret():
     print("BETTER_AUTH_SECRET rotated (value not printed); every signed-in cookie is void")
 
 
-def cmd_reset_demo():
-    cmd_reset_db()
-    rotate_auth_secret()
+def revoke_demo():
     r = sh(["podman", "exec", DB, "psql", "-U", "postgres", "-d", "crm", "-At",
             "-v", "ON_ERROR_STOP=1", "-c", REVOKE_DEMO_SQL], quiet=True)
     print(r.stdout.strip() or r.stderr.strip()[-500:])
     if r.returncode != 0:
         sys.exit("demo revoke failed; api and app left stopped")
+
+
+def cmd_reset_demo():
+    cmd_reset_db()
+    rotate_auth_secret()
+    revoke_demo()
+    cmd_api()
+    cmd_app()
+
+
+def cmd_disable_demo():
+    """Switch the public demo off with no window in which a live demo session
+    is honoured unguarded. The api and app stop first, so nothing serves
+    while the flag, the secret and the database change; they start again only
+    after every step has succeeded. A failure leaves them stopped (closed).
+    Re-enable with `demo-env` then `reset-demo`."""
+    stop_services()
+    set_env({"DEMO_LOGIN_ENABLED": "false"})
+    print("prod.env DEMO_LOGIN_ENABLED=false")
+    rotate_auth_secret()
+    revoke_demo()
     cmd_api()
     cmd_app()
 
@@ -275,7 +324,7 @@ def cmd_build_app():
 
 def run_service(name, image, workdir, port, script, health):
     sh(["podman", "rm", "-f", name], quiet=True)
-    sh([
+    sh(check=True, cmd=[
         "podman", "run", "-d", "--name", name, "--pod", POD,
         "--restart", "unless-stopped", *LIMITS[name],
         "--env-file", APP_ENV, *TELEMETRY_OFF, "-e", f"PORT={port}",
@@ -332,6 +381,7 @@ def cmd_down():
 COMMANDS = {
     "secrets": cmd_secrets, "pod": cmd_pod, "db": cmd_db, "migrate": cmd_migrate,
     "seed": cmd_seed, "demo-env": cmd_demo_env, "reset-db": cmd_reset_db, "reset-demo": cmd_reset_demo,
+    "disable-demo": cmd_disable_demo,
     "build-api": cmd_build_api, "build-app": cmd_build_app,
     "api": cmd_api, "app": cmd_app, "up": cmd_up, "status": cmd_status,
     "down": cmd_down,
