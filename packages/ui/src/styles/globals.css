@@ -78,63 +78,66 @@
 }
 
 /*
- * Dark is the glass theme: smoky charcoal/olive glass over a soft organic
- * backdrop, lime accent. Surfaces are translucent tokens; the blur, edge
- * highlight and depth come from the "Glass" section below, and fall back to
- * opaque fills without backdrop-filter or with prefers-reduced-transparency.
+ * Dark is the glass theme: neutral frosted panes over a graphite backdrop
+ * with one soft top light, monochrome chrome and a white primary. Colour is
+ * kept for data (muted stage/series hues) and the demo warning icon. The
+ * blur, edge and depth come from the "Glass" section below, and fall back to
+ * opaque graphite without backdrop-filter or with prefers-reduced-transparency.
  */
 .dark {
 	color-scheme: dark;
-	--background: #0b0d0a;
-	--foreground: #f2f4ee;
-	--card: rgb(30 34 27 / 0.58);
-	--card-foreground: #f2f4ee;
-	--popover: rgb(18 20 24 / 0.74);
-	--popover-foreground: #f2f4ee;
-	--primary: #c5f04a;
-	--primary-foreground: #131807;
-	--secondary: rgb(255 255 255 / 0.08);
-	--secondary-foreground: #f2f4ee;
-	--muted: rgb(255 255 255 / 0.06);
-	--muted-foreground: #d6dbcd;
-	--accent: rgb(255 255 255 / 0.11);
-	--accent-foreground: #f2f4ee;
-	--tag: rgb(255 255 255 / 0.1);
-	--tag-foreground: #f2f4ee;
+	--background: #0b0c0e;
+	--foreground: #f4f4f6;
+	--card: rgb(255 255 255 / 0.05);
+	--card-foreground: #f4f4f6;
+	--popover: rgb(24 25 28 / 0.8);
+	--popover-foreground: #f4f4f6;
+	--primary: #f4f4f6;
+	--primary-foreground: #111215;
+	--secondary: rgb(255 255 255 / 0.07);
+	--secondary-foreground: #f4f4f6;
+	--muted: rgb(255 255 255 / 0.05);
+	--muted-foreground: #a9acb3;
+	--accent: rgb(255 255 255 / 0.09);
+	--accent-foreground: #f4f4f6;
+	--tag: rgb(255 255 255 / 0.08);
+	--tag-foreground: #f4f4f6;
 	--destructive: #ae2e24;
 	--destructive-foreground: #ffffff;
-	--success: oklch(0.72 0.16 155);
+	--success: oklch(0.78 0.07 160);
 	--success-foreground: oklch(0.205 0 0);
-	--warning: oklch(0.8 0.15 75);
+	--warning: oklch(0.82 0.11 78);
 	--warning-foreground: oklch(0.205 0 0);
-	--info: oklch(0.7 0.15 250);
+	--info: oklch(0.76 0.05 250);
 	--info-foreground: oklch(0.205 0 0);
-	--border: rgb(255 255 255 / 0.1);
-	--input: rgb(255 255 255 / 0.14);
-	--overlay: rgb(4 6 3 / 0.45);
-	--ring: #c5f04a;
-	--chart-1: #b6e03c;
-	--chart-2: #4b87f0;
-	--chart-3: #c07e22;
-	--chart-4: #9b7bf0;
-	--chart-5: #3fd8c8;
-	--severity-critical: oklch(0.637 0.237 25.331);
-	--severity-high: oklch(0.705 0.213 47.604);
-	--severity-medium: var(--chart-2);
+	--border: rgb(255 255 255 / 0.08);
+	--input: rgb(255 255 255 / 0.12);
+	--overlay: rgb(0 0 0 / 0.5);
+	--ring: #d9dbe0;
+	/* Muted data hues, one per open stage (blue-grey, sage, sand, dusk) and
+	   a neutral slate for totals; see apps/app/lib/deal-stage.ts. */
+	--chart-1: #8fa6c6;
+	--chart-2: #9cb39a;
+	--chart-3: #c8b290;
+	--chart-4: #a69dbb;
+	--chart-5: #8d939d;
+	--severity-critical: oklch(0.66 0.17 25);
+	--severity-high: oklch(0.72 0.14 50);
+	--severity-medium: var(--chart-3);
 	--severity-low: var(--muted-foreground);
 	--severity-info: oklch(0.71 0.01 286);
 	--severity-unknown: oklch(0.5 0 0);
 	--code-foreground: #e3e3e3;
-	--code-accent: #e5735b;
-	--code-string: #40be96;
-	--sidebar: rgb(24 27 21 / 0.55);
-	--sidebar-foreground: #f2f4ee;
-	--sidebar-primary: #c5f04a;
-	--sidebar-primary-foreground: #131807;
-	--sidebar-accent: rgb(255 255 255 / 0.11);
-	--sidebar-accent-foreground: #f2f4ee;
-	--sidebar-border: rgb(255 255 255 / 0.1);
-	--sidebar-ring: #c5f04a;
+	--code-accent: #d7a08f;
+	--code-string: #a9c2a7;
+	--sidebar: rgb(255 255 255 / 0.04);
+	--sidebar-foreground: #f4f4f6;
+	--sidebar-primary: #f4f4f6;
+	--sidebar-primary-foreground: #111215;
+	--sidebar-accent: rgb(255 255 255 / 0.09);
+	--sidebar-accent-foreground: #f4f4f6;
+	--sidebar-border: rgb(255 255 255 / 0.08);
+	--sidebar-ring: #d9dbe0;
 	/* SF on Apple platforms, then Inter if installed, then Geist. */
 	--font-sans:
 		-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
@@ -159,148 +162,114 @@
 	--shadow-xl: 0px 20px 48px -12px hsl(0 0% 0% / 0.55);
 	--shadow-2xl: 0px 28px 72px -16px hsl(0 0% 0% / 0.6);
 
-	/* Glass: a thin white pane over a light smoke scrim, lit from the top
-	   left. The scrim (background-color) keeps text at AA; the tint and the
-	   diagonal sheen (background-image) are what reads as glass. Three
-	   layers: chrome (top bar, rail) is the clearest and floats highest,
-	   panels (cards) sit under it, and controls inside are a brighter wash. */
-	--glass-blur: blur(30px) saturate(190%);
-	--glass-blur-soft: blur(24px) saturate(180%);
-	--glass-fill: rgb(10 12 16 / 0.26);
-	--glass-sheen:
-		linear-gradient(
-			118deg,
-			transparent 30%,
-			rgb(255 255 255 / 0.045) 44%,
-			transparent 58%
-		),
-		linear-gradient(
-			160deg,
-			rgb(255 255 255 / 0.15) 0%,
-			rgb(255 255 255 / 0.085) 34%,
-			rgb(255 255 255 / 0.07) 100%
-		);
-	--glass-chrome: rgb(10 12 16 / 0.22);
+	/* Glass: a thin white pane, lit from above. Three layers: chrome (top
+	   bar, rail) floats highest, panels (cards) sit under it, and controls
+	   inside are a slightly brighter wash. All neutral; nothing is tinted. */
+	--glass-blur: blur(32px) saturate(120%);
+	--glass-blur-soft: blur(24px) saturate(120%);
+	--glass-fill: rgb(255 255 255 / 0.04);
+	--glass-sheen: linear-gradient(
+		180deg,
+		rgb(255 255 255 / 0.04) 0%,
+		rgb(255 255 255 / 0.015) 48%,
+		rgb(255 255 255 / 0) 100%
+	);
+	--glass-chrome: rgb(255 255 255 / 0.05);
 	--glass-chrome-sheen: linear-gradient(
 		180deg,
-		rgb(255 255 255 / 0.16) 0%,
-		rgb(255 255 255 / 0.1) 100%
+		rgb(255 255 255 / 0.05) 0%,
+		rgb(255 255 255 / 0.015) 100%
 	);
-	--glass-control: rgb(255 255 255 / 0.1);
-	--glass-control-hover: rgb(255 255 255 / 0.16);
-	--glass-control-scrim: rgb(8 10 14 / 0.38);
+	--glass-control: rgb(255 255 255 / 0.07);
+	--glass-control-hover: rgb(255 255 255 / 0.12);
+	--glass-control-scrim: rgb(255 255 255 / 0.06);
 	--glass-control-sheen: linear-gradient(
 		180deg,
-		rgb(255 255 255 / 0.15),
-		rgb(255 255 255 / 0.08)
+		rgb(255 255 255 / 0.05),
+		rgb(255 255 255 / 0.01)
 	);
 	--glass-control-sheen-hover: linear-gradient(
 		180deg,
-		rgb(255 255 255 / 0.22),
-		rgb(255 255 255 / 0.13)
+		rgb(255 255 255 / 0.1),
+		rgb(255 255 255 / 0.05)
 	);
-	--glass-lane: rgb(255 255 255 / 0.03);
-	--glass-radius: 22px;
-	/* The rim: bright where the light hits (top / top-left), nearly gone at
-	   the bottom, with a faint bounce on the lower right. */
-	--glass-edge: rgb(255 255 255 / 0.14);
+	--glass-lane: transparent;
+	--glass-radius: 20px;
+	/* The rim: a directional hairline, brightest along the top. */
+	--glass-edge: rgb(255 255 255 / 0.1);
 	--glass-rim: linear-gradient(
-		160deg,
-		rgb(255 255 255 / 0.3) 0%,
-		rgb(255 255 255 / 0.12) 28%,
-		rgb(255 255 255 / 0.04) 62%,
-		rgb(255 255 255 / 0.04) 86%,
-		rgb(255 255 255 / 0.1) 100%
+		180deg,
+		rgb(255 255 255 / 0.2) 0%,
+		rgb(255 255 255 / 0.09) 22%,
+		rgb(255 255 255 / 0.04) 60%,
+		rgb(255 255 255 / 0.04) 100%
 	);
-	--glass-highlight:
-		inset 0 1px 0 0 rgb(255 255 255 / 0.22),
-		inset 0 -1px 0 0 rgb(255 255 255 / 0.03);
+	--glass-highlight: inset 0 1px 0 0 rgb(255 255 255 / 0.07);
 	--glass-depth:
-		0 1px 1px rgb(0 0 0 / 0.12), 0 10px 24px -12px rgb(0 0 0 / 0.45),
-		0 24px 48px -24px rgb(0 0 0 / 0.5);
+		0 1px 1px rgb(0 0 0 / 0.18), 0 12px 32px -14px rgb(0 0 0 / 0.55);
 	--glass-float:
-		0 2px 6px rgb(0 0 0 / 0.22), 0 20px 44px -14px rgb(0 0 0 / 0.55),
-		0 40px 80px -32px rgb(0 0 0 / 0.55);
-	/* Selected states are tinted glass lime; solid lime is the primary CTA only. */
-	--glass-active-scrim: rgb(8 12 4 / 0.42);
+		0 2px 6px rgb(0 0 0 / 0.24), 0 24px 56px -20px rgb(0 0 0 / 0.65);
+	/* Selected states are brighter neutral glass with white text. */
+	--glass-active-scrim: rgb(255 255 255 / 0.12);
 	--glass-active-sheen: linear-gradient(
 		180deg,
-		rgb(214 247 120 / 0.34),
-		rgb(197 240 74 / 0.2)
+		rgb(255 255 255 / 0.1),
+		rgb(255 255 255 / 0.03)
 	);
-	--glass-active-edge: rgb(214 247 120 / 0.5);
-	--glass-active-foreground: #f4ffd6;
-	--glass-warning: #f7b844;
+	--glass-active-edge: rgb(255 255 255 / 0.16);
+	--glass-active-foreground: #ffffff;
+	--glass-warning: #e6b45c;
 	--glass-warning-foreground: #241700;
-	/* Fine grain over the colour, which the blur in each pane smooths away. */
-	--glass-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .085 0 0 0 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-	/* Lime, teal and violet, with amber as one small warm accent. The centre
-	   blobs sit behind the content column so every pane has colour to frost. */
+	/* Fine grain, which the blur in each pane smooths away. */
+	--glass-grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .05 0 0 0 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+	/* Graphite with one soft white light from the top centre, a fainter
+	   bounce low on the right, and a vignette. No hue anywhere. */
 	--glass-backdrop:
 		var(--glass-grain),
 		radial-gradient(
-			38vmax 30vmax at 8% 0%,
-			rgb(197 240 74 / 0.42),
-			transparent 70%
-		),
-		radial-gradient(
-			40vmax 34vmax at 96% 12%,
-			rgb(20 184 166 / 0.55),
-			transparent 70%
-		),
-		radial-gradient(
-			46vmax 38vmax at 12% 100%,
-			rgb(124 58 237 / 0.6),
-			transparent 70%
-		),
-		radial-gradient(
-			22vmax 18vmax at 92% 96%,
-			rgb(245 158 11 / 0.3),
-			transparent 70%
-		),
-		radial-gradient(
-			36vmax 26vmax at 48% 34%,
-			rgb(45 212 191 / 0.3),
+			70vmax 46vmax at 50% -12%,
+			rgb(255 255 255 / 0.09),
+			rgb(255 255 255 / 0.025) 45%,
 			transparent 72%
 		),
 		radial-gradient(
-			34vmax 28vmax at 62% 72%,
-			rgb(139 92 246 / 0.42),
-			transparent 72%
+			40vmax 30vmax at 88% 108%,
+			rgb(255 255 255 / 0.03),
+			transparent 70%
 		),
 		radial-gradient(
-			28vmax 22vmax at 30% 56%,
-			rgb(197 240 74 / 0.2),
-			transparent 72%
+			ellipse 120% 100% at 50% 30%,
+			transparent 55%,
+			rgb(0 0 0 / 0.45) 100%
 		),
-		linear-gradient(160deg, #10140f 0%, #0c0e12 55%, #0e0c14 100%);
+		linear-gradient(180deg, #141518 0%, #0d0e10 55%, #0a0a0c 100%);
 }
 
 /*
  * Without backdrop-filter, or when the visitor asks for less transparency,
- * glass turns into opaque smoked fills with the same hue, so text never sits
- * on an unblurred, busy backdrop.
+ * glass turns into opaque graphite, so text never sits on an unblurred
+ * backdrop.
  */
 @supports not (
 		(backdrop-filter: blur(1px)) or
 		(-webkit-backdrop-filter: blur(1px))
 	) {
 	.dark {
-		--card: #1b1e18;
-		--popover: #1d2019;
-		--sidebar: #161914;
-		--glass-chrome: #121410;
-		--glass-fill: #1b1e18;
-		--glass-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
-		--glass-chrome-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
-		--glass-control: #262a22;
-		--glass-control-hover: #30352b;
-		--glass-control-scrim: #262a22;
+		--card: #1a1b1e;
+		--popover: #1d1e22;
+		--sidebar: #151619;
+		--glass-chrome: #151619;
+		--glass-fill: #1a1b1e;
+		--glass-sheen: linear-gradient(rgb(255 255 255 / 0.02), transparent);
+		--glass-chrome-sheen: linear-gradient(rgb(255 255 255 / 0.02), transparent);
+		--glass-control: #24252a;
+		--glass-control-hover: #2c2d32;
+		--glass-control-scrim: #24252a;
 		--glass-control-sheen: none;
-		--glass-control-sheen-hover: linear-gradient(#30352b, #30352b);
-		--glass-active-scrim: #2e3a14;
+		--glass-control-sheen-hover: linear-gradient(#2c2d32, #2c2d32);
+		--glass-active-scrim: #34363c;
 		--glass-active-sheen: none;
-		--glass-lane: #121410;
+		--glass-lane: transparent;
 		--glass-blur: none;
 		--glass-blur-soft: none;
 	}
@@ -308,22 +277,22 @@
 
 @media (prefers-reduced-transparency: reduce) {
 	.dark {
-		--card: #1b1e18;
-		--popover: #1d2019;
-		--sidebar: #161914;
-		--glass-chrome: #121410;
-		--glass-fill: #1b1e18;
-		--glass-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
-		--glass-chrome-sheen: linear-gradient(rgb(255 255 255 / 0.03), transparent);
-		--glass-control: #262a22;
-		--glass-control-hover: #30352b;
-		--glass-control-scrim: #262a22;
+		--card: #1a1b1e;
+		--popover: #1d1e22;
+		--sidebar: #151619;
+		--glass-chrome: #151619;
+		--glass-fill: #1a1b1e;
+		--glass-sheen: linear-gradient(rgb(255 255 255 / 0.02), transparent);
+		--glass-chrome-sheen: linear-gradient(rgb(255 255 255 / 0.02), transparent);
+		--glass-control: #24252a;
+		--glass-control-hover: #2c2d32;
+		--glass-control-scrim: #24252a;
 		--glass-control-sheen: none;
-		--glass-control-sheen-hover: linear-gradient(#30352b, #30352b);
-		--glass-active-scrim: #2e3a14;
+		--glass-control-sheen-hover: linear-gradient(#2c2d32, #2c2d32);
+		--glass-active-scrim: #34363c;
 		--glass-active-sheen: none;
-		--glass-lane: #121410;
-		--overlay: rgb(4 6 3 / 0.75);
+		--glass-lane: transparent;
+		--overlay: rgb(0 0 0 / 0.75);
 		--glass-blur: none;
 		--glass-blur-soft: none;
 	}
@@ -522,7 +491,7 @@
 		pointer-events: none;
 	}
 	.dark [data-slot="auth-card"] {
-		border-radius: 30px;
+		border-radius: 28px;
 		box-shadow: var(--glass-highlight), var(--glass-float);
 		-webkit-backdrop-filter: var(--glass-blur);
 		backdrop-filter: var(--glass-blur);
@@ -539,21 +508,32 @@
 		gap: 12px;
 	}
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel"] {
-		border-radius: calc(var(--glass-radius) + 4px);
+		overflow: visible;
+		border-radius: 0;
 		background-color: var(--glass-lane);
 		background-image: none;
-		box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.05);
+		box-shadow: none;
 		-webkit-backdrop-filter: none;
 		backdrop-filter: none;
 	}
 	.dark [data-slot="deals-board-column"] [data-slot="card-panel"]::before {
-		opacity: 0.35;
+		display: none;
+	}
+	/* The stack keeps its padding (so card shadows are not clipped) and
+	   pulls it back out, so cards line up with the column header. */
+	.dark [data-slot="deals-board-column"] [data-slot="card-panel-scroll"] {
+		margin-inline: -8px;
+	}
+	.dark [data-slot="deals-board-column"] [data-slot="card-panel-empty"] {
+		min-height: 88px;
+		border: 1px dashed rgb(255 255 255 / 0.1);
+		border-radius: calc(var(--glass-radius) - 4px);
 	}
 
 	/* An empty panel says so in the middle of the pane. */
 	.dark [data-slot="card-panel-empty"] {
 		min-height: 120px;
-		color: rgb(242 244 238 / 0.82);
+		color: var(--muted-foreground);
 		font-size: 13px;
 	}
 
@@ -602,7 +582,7 @@
 			right: 10px;
 			height: auto;
 			border: 1px solid var(--glass-edge);
-			border-top-color: rgb(255 255 255 / 0.26);
+			border-top-color: rgb(255 255 255 / 0.2);
 			border-radius: calc(var(--radius-xl) + 4px);
 			overflow: hidden;
 		}
@@ -661,7 +641,7 @@
 		border-radius: 9999px;
 	}
 	.dark [data-slot="app-rail"] [data-slot="button"]:not([aria-current="page"]) {
-		color: rgb(242 244 238 / 0.86);
+		color: rgb(244 244 246 / 0.74);
 	}
 
 	/* Pill controls: buttons (also when a trigger renders them), fields and
@@ -703,8 +683,8 @@
 		box-shadow:
 			inset 0 1px 0 0 rgb(255 255 255 / 0.1),
 			0 1px 2px rgb(0 0 0 / 0.2);
-		-webkit-backdrop-filter: blur(16px) saturate(180%);
-		backdrop-filter: blur(16px) saturate(180%);
+		-webkit-backdrop-filter: blur(20px) saturate(120%);
+		backdrop-filter: blur(20px) saturate(120%);
 	}
 	/* Labels on a control (the Enrichment chip's status) take the full
 	   foreground, since the colour behind a pill can be bright. */
@@ -730,11 +710,15 @@
 		background-image: var(--glass-control-sheen-hover);
 		color: var(--foreground);
 	}
-	/* The primary action is the only solid lime. */
+	/* The primary action is the only solid fill: a white pill. */
 	.dark [data-slot="button"][data-variant="default"] {
 		box-shadow:
-			inset 0 1px 0 0 rgb(255 255 255 / 0.45),
-			0 6px 18px -8px rgb(197 240 74 / 0.7);
+			inset 0 1px 0 0 rgb(255 255 255 / 0.6),
+			0 1px 2px rgb(0 0 0 / 0.3),
+			0 8px 20px -12px rgb(0 0 0 / 0.6);
+	}
+	.dark [data-slot="button"][data-variant="default"]:hover {
+		background-color: #ffffff;
 	}
 
 	/* Pill navigation: segmented tabs and toggle groups. */
@@ -746,8 +730,8 @@
 		background-color: var(--glass-control-scrim);
 		background-image: var(--glass-control-sheen);
 		box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.08);
-		-webkit-backdrop-filter: blur(16px) saturate(180%);
-		backdrop-filter: blur(16px) saturate(180%);
+		-webkit-backdrop-filter: blur(20px) saturate(120%);
+		backdrop-filter: blur(20px) saturate(120%);
 	}
 	.dark
 		[data-slot="tabs-list"][data-variant="default"]
@@ -765,8 +749,8 @@
 		box-shadow:
 			inset 0 1px 0 0 rgb(255 255 255 / 0.08),
 			0 1px 2px rgb(0 0 0 / 0.2);
-		-webkit-backdrop-filter: blur(16px) saturate(180%);
-		backdrop-filter: blur(16px) saturate(180%);
+		-webkit-backdrop-filter: blur(20px) saturate(120%);
+		backdrop-filter: blur(20px) saturate(120%);
 	}
 	.dark
 		[data-slot="toggle-group"][data-spacing="0"]
@@ -789,7 +773,7 @@
 		border-end-end-radius: 9999px;
 		padding-inline-end: 12px;
 	}
-	/* Selected is tinted lime glass, the same on toggles, tabs and the rail. */
+	/* Selected is brighter neutral glass, the same on toggles, tabs and the rail. */
 	.dark
 		[data-slot="toggle-group"]
 		> [data-slot="toggle-group-item"][data-state="on"],
@@ -803,13 +787,13 @@
 		color: var(--glass-active-foreground);
 		box-shadow:
 			inset 0 0 0 1px var(--glass-active-edge),
-			inset 0 1px 0 0 rgb(255 255 255 / 0.3),
-			0 4px 16px -6px rgb(197 240 74 / 0.45);
+			inset 0 1px 0 0 rgb(255 255 255 / 0.14),
+			0 2px 8px -4px rgb(0 0 0 / 0.5);
 	}
 
 	/* Tables read as rows on glass; the sticky header stays legible. */
 	.dark [data-slot="table-container"] [data-slot="table-head"] {
-		background-color: rgb(22 25 28 / 0.86);
+		background-color: rgb(20 21 24 / 0.88);
 	}
 	.dark [data-slot="table-row"]:hover {
 		background-color: rgb(255 255 255 / 0.05);
@@ -841,7 +825,7 @@
 		[data-slot="deals-board-column"]
 		[data-slot="card-panel-detail"]
 		[data-slot="button"] {
-		color: rgb(242 244 238 / 0.82);
+		color: var(--muted-foreground);
 	}
 	.dark
 		[data-slot="deals-board-column"]
@@ -871,10 +855,10 @@
 
 @media (prefers-reduced-transparency: reduce) {
 	.dark [data-slot="table-container"] [data-slot="table-head"] {
-		background-color: #1b1e18;
+		background-color: #1a1b1e;
 	}
 	.dark [data-slot="demo-banner"][data-variant="strip"] {
-		background: #3a2c0c;
+		background: #1d1e22;
 	}
 }
 

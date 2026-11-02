@@ -48,7 +48,7 @@ function DemoBanner({
         data-slot="demo-banner"
         data-variant="card"
         className={cn(
-          "flex flex-col gap-0.5 rounded-xl border border-amber-300/70 bg-amber-50 px-4 py-3 text-amber-950 dark:rounded-2xl dark:border-(--glass-warning)/45 dark:bg-(--glass-warning)/12 dark:text-amber-50 dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.12)]",
+          "flex flex-col gap-0.5 rounded-xl border border-amber-300/70 bg-amber-50 px-4 py-3 text-amber-950 dark:rounded-2xl dark:border-white/10 dark:border-t-white/16 dark:bg-white/[0.05] dark:text-[#f4f4f6] dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.06)]",
           className
         )}
       >
@@ -56,7 +56,7 @@ function DemoBanner({
           <WarningIcon className="text-amber-600 dark:text-(--glass-warning)" />
           {DEMO_BANNER_TITLE}
         </strong>
-        <p aria-hidden="true" className="pl-6 text-[13px]/5">
+        <p aria-hidden="true" className="pl-6 text-[13px]/5 dark:text-[#b4b7be]">
           {DEMO_BANNER_CARD_LINE}
         </p>
         <ul className="sr-only">
@@ -74,12 +74,12 @@ function DemoBanner({
       data-slot="demo-banner"
       data-variant="strip"
       className={cn(
-        "shrink-0 truncate border-b border-amber-300/60 bg-amber-50 px-3 py-1.5 text-center text-[13px]/5 text-amber-950 dark:border-(--glass-warning)/30 dark:bg-[rgb(26_18_4/0.5)] dark:bg-linear-to-b dark:from-(--glass-warning)/24 dark:to-(--glass-warning)/14 dark:text-[#fff4dc] dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.1)] dark:backdrop-blur-xl dark:backdrop-saturate-[1.8]",
+        "shrink-0 truncate border-b border-amber-300/60 bg-amber-50 px-3 py-1.5 text-center text-[13px]/5 text-amber-950 dark:border-white/8 dark:bg-white/[0.04] dark:text-[#c9ccd2] dark:shadow-[inset_0_1px_0_0_rgb(255_255_255/0.05)] dark:backdrop-blur-2xl dark:backdrop-saturate-[1.2]",
         className
       )}
     >
       <WarningIcon className="mr-1.5 inline-block align-[-3px] dark:text-(--glass-warning)" />
-      <strong className="font-semibold">{DEMO_BANNER_TITLE}</strong>
+      <strong className="font-semibold dark:text-[#f4f4f6]">{DEMO_BANNER_TITLE}</strong>
       <span aria-hidden="true" className="md:hidden">
         <span className="px-1.5 opacity-60">·</span>
         {DEMO_BANNER_SHORT}
