@@ -1,4 +1,5 @@
 import type { MailboxProviderId } from "@crm/auth/scopes";
+import { DemoBanner } from "@crm/ui/components/demo-banner";
 import type { Metadata } from "next";
 import { redirect, unstable_rethrow } from "next/navigation";
 import { Suspense } from "react";
@@ -113,7 +114,12 @@ async function SignIn({
 				description="Sign in with your account to continue."
 			/>
 
-			{demo ? <DemoSignIn action={DEMO_SIGN_IN_URL} /> : null}
+			{demo ? (
+				<>
+					<DemoBanner className="rounded-md border" />
+					<DemoSignIn action={DEMO_SIGN_IN_URL} />
+				</>
+			) : null}
 			{showSso ? <SsoSignIn providers={providers} /> : null}
 			{social.map((provider) => (
 				<SocialSignIn key={provider} provider={provider} />

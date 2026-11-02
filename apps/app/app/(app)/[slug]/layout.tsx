@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { AppHeader, AppHeaderFallback } from "@/components/app-header";
 import { AppIconRail, AppIconRailFallback } from "@/components/app-icon-rail";
 import { QuickSwitcher } from "@/components/crm/quick-switcher";
+import { DemoUserBanner } from "@/components/demo-banner";
 import { RecordSheetHost } from "@/components/crm/record-sheet/record-sheet-host";
 import { MobileNavProvider } from "@/components/mobile-nav";
 import { requireMailboxAccess } from "@/lib/session";
@@ -17,6 +18,10 @@ export default function AppLayout({
 	return (
 		<MobileNavProvider>
 			<div className="isolate flex h-svh flex-col">
+				<Suspense fallback={null}>
+					<DemoUserBanner />
+				</Suspense>
+
 				<Suspense fallback={<AppHeaderFallback />}>
 					<WorkspaceHeader params={params} />
 				</Suspense>
