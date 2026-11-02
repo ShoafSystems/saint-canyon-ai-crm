@@ -1,12 +1,16 @@
 import { connection } from "next/server";
 import { bufferedProxyResponse } from "@/lib/api-proxy-response";
+import { apiProxyTarget } from "@/lib/api-proxy-target";
 import { API_URL } from "@/lib/env";
 
 async function handler(request: Request): Promise<Response> {
 	await connection();
 
 	const url = new URL(request.url);
-	const target = `${API_URL}${url.pathname}${url.search}`;
+	const target = apiProxyTarget(request.url, API_URL);
+	if (!target) {
+		return Response.json({ error: "Not found." }, { status: 404 });
+	}
 
 	const headers = new Headers(request.headers);
 	for (const header of [
