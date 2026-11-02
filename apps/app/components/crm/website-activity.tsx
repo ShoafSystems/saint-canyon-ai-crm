@@ -56,7 +56,7 @@ export function WebsiteActivity({
 			<DetailSheetProperties>
 				<DetailSheetProperty label="Page views">
 					<span className="tabular-nums">
-						{activity.views.toLocaleString()}
+						{activity.views.toLocaleString("en-US")}
 					</span>
 					{activity.lastSeenAt ? (
 						<span className="text-muted-foreground">

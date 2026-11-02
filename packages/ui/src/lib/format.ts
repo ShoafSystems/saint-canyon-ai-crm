@@ -34,12 +34,15 @@ function fractionDigits(code: string): number {
 	return digits;
 }
 
+// Money renders on the server and again in the browser, so it uses one fixed
+// locale, like percentages and days. The runtime default differs between the
+// two (server en-US, a visitor's de-DE) and React refuses the mismatched text.
 export function formatMoney(cents: number, currency = "usd"): string {
 	const code = displayCurrencyCode(currency);
 	const whole = cents % 100 === 0;
 	const digits = fractionDigits(code);
 
-	return new Intl.NumberFormat(undefined, {
+	return new Intl.NumberFormat("en-US", {
 		style: "currency",
 		currency: code,
 		minimumFractionDigits: whole ? 0 : Math.min(2, digits),
@@ -48,7 +51,7 @@ export function formatMoney(cents: number, currency = "usd"): string {
 }
 
 export function formatMoneyCompact(cents: number, currency = "usd"): string {
-	return new Intl.NumberFormat(undefined, {
+	return new Intl.NumberFormat("en-US", {
 		style: "currency",
 		currency: displayCurrencyCode(currency),
 		notation: "compact",

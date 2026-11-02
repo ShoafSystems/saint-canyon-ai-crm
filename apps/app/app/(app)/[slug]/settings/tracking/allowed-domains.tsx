@@ -102,7 +102,7 @@ export function AllowedDomains() {
 								{SCOPES[domain.scope]}
 							</TableCell>
 							<TableCell className={`${CELL} text-right tabular-nums`}>
-								{domain.pageViews.toLocaleString()}
+								{domain.pageViews.toLocaleString("en-US")}
 							</TableCell>
 							<TableCell className={`${CELL} text-right text-muted-foreground`}>
 								{domain.lastSeenAt ? (
