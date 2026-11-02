@@ -245,7 +245,7 @@ export function CompaniesTable() {
 	return (
 		<DataTable
 			query={query}
-			search={<ListSearch placeholder="Search companies by name or domain…" />}
+			search={<ListSearch placeholder="Search companies" />}
 			actions={
 				<>
 					<SavedViewsMenu entity="COMPANY" table={table} />

@@ -207,7 +207,7 @@ export function DashboardSummary() {
 					</CardHeader>
 					<CardPanel>
 						{overdueTasks.length === 0 ? (
-							<CardPanelEmpty>Nothing overdue. Good.</CardPanelEmpty>
+							<CardPanelEmpty>Nothing overdue</CardPanelEmpty>
 						) : (
 							<SimpleTable
 								variant="panel"

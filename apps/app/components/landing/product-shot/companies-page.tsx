@@ -86,7 +86,7 @@ function Toolbar() {
 			<div className="flex h-8 w-64 shrink-0 items-center rounded-md border border-border bg-muted pl-2">
 				<Search size={16} className="shrink-0 text-muted-foreground" />
 				<span className="truncate pl-1.5 text-muted-foreground text-xs">
-					Search companies by name or domain…
+					Search companies
 				</span>
 			</div>
 
