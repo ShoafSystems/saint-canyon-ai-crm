@@ -75,8 +75,20 @@ The app already routes this way:
 Consequences:
 
 - `/internal/*` (cron) and the Swagger UI at the API root stay unreachable from outside, because only the app port is served.
-- The API sees the app's IP rather than the client's, which matters for rate limits.
+- Through `/api/*` the API sees the app's IP rather than the client's. The demo sign-in, the one route rate-limited by IP, goes through `apps/app/app/demo/session/route.ts` instead. That route forwards `X-Forwarded-For` unchanged and appends nothing. On the path browser → Funnel → app → API, only Funnel appends to it, so `TRUST_PROXY_HOPS=1` keys the limit on the address Funnel saw.
 - If either of these becomes a problem, a small Caddy can send `/api/*` straight to `:3101`, with no change to the env.
+
+## Public demo: reset before exposure and nightly
+
+```
+python3 deploy/forge/stack.py reset-demo
+```
+
+This runs `reset-db`: it stops the api and app, recreates the database, then migrates and reseeds it. Next it rotates `BETTER_AUTH_SECRET` in `prod.env`, and runs an explicit, counted delete of the demo user's sessions and API keys. Last, it starts the api and app again.
+
+Recreating the database drops the session rows, but that alone is not enough. Better Auth's cookie cache (5 minutes) keeps honouring a signed session cookie without checking the database. Rotating the secret is what ends every visitor's session immediately. The demo has no real users, so nothing else depends on the old secret.
+
+Run it once right before switching the public link on, then nightly while the demo is public. This slice sets up no scheduler (see Scheduler). A nightly trigger is a separate decision, for example a systemd user timer that runs the command above. Every run interrupts sign-in for about a minute.
 
 ## Not in this slice
 

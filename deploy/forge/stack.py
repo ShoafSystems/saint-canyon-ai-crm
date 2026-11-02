@@ -10,6 +10,8 @@ Usage: python3 deploy/forge/stack.py <command> [...]
   seed         load the sample data (one-off container)
   demo-env     set the demo keys in an existing prod.env (secrets kept)
   reset-db     stop api/app, recreate the database, migrate, seed
+  reset-demo   reset-db, rotate BETTER_AUTH_SECRET, revoke demo sessions and
+               API keys, start api/app (before exposure, then nightly)
   build-api    bun build -> apps/api/dist (no network)
   build-app    next build on Node 22, detached (no network); poll with `logs`
   api          start the API (bun dist/main.js)
@@ -219,6 +221,42 @@ def cmd_reset_db():
     cmd_seed()
 
 
+# Run before exposing the demo and nightly while it is public. Recreating the
+# database already drops every session and API key, but Better Auth's cookie
+# cache (packages/auth, 5 minutes) keeps honouring a signed session cookie
+# without asking the database. Rotating BETTER_AUTH_SECRET is what ends a
+# visitor's session at once; the SQL is the explicit, counted revoke.
+REVOKE_DEMO_SQL = f"""
+WITH demo AS (SELECT id FROM "user" WHERE lower(email) = lower('{DEMO_LOGIN_EMAIL}')),
+     sessions AS (DELETE FROM "session" WHERE "userId" IN (SELECT id FROM demo) RETURNING 1),
+     keys AS (DELETE FROM "apikey" WHERE "referenceId" IN (SELECT id FROM demo) RETURNING 1)
+SELECT (SELECT count(*) FROM sessions) || ' session(s), '
+    || (SELECT count(*) FROM keys) || ' API key(s) revoked for the demo user';
+"""
+
+
+def rotate_auth_secret():
+    with open(APP_ENV) as f:
+        lines = f.read().splitlines()
+    kept = [l for l in lines if l.split("=", 1)[0] != "BETTER_AUTH_SECRET"]
+    write_private(APP_ENV, kept + [
+        f"BETTER_AUTH_SECRET={base64.b64encode(secrets.token_bytes(32)).decode()}",
+    ])
+    print("BETTER_AUTH_SECRET rotated (value not printed); every signed-in cookie is void")
+
+
+def cmd_reset_demo():
+    cmd_reset_db()
+    rotate_auth_secret()
+    r = sh(["podman", "exec", DB, "psql", "-U", "postgres", "-d", "crm", "-At",
+            "-v", "ON_ERROR_STOP=1", "-c", REVOKE_DEMO_SQL], quiet=True)
+    print(r.stdout.strip() or r.stderr.strip()[-500:])
+    if r.returncode != 0:
+        sys.exit("demo revoke failed; api and app left stopped")
+    cmd_api()
+    cmd_app()
+
+
 def cmd_build_api():
     oneoff("compai-prod-build-api", BUN_IMAGE, "apps/api", "bun run build", network="none")
 
@@ -293,7 +331,8 @@ def cmd_down():
 
 COMMANDS = {
     "secrets": cmd_secrets, "pod": cmd_pod, "db": cmd_db, "migrate": cmd_migrate,
-    "seed": cmd_seed, "demo-env": cmd_demo_env, "reset-db": cmd_reset_db, "build-api": cmd_build_api, "build-app": cmd_build_app,
+    "seed": cmd_seed, "demo-env": cmd_demo_env, "reset-db": cmd_reset_db, "reset-demo": cmd_reset_demo,
+    "build-api": cmd_build_api, "build-app": cmd_build_app,
     "api": cmd_api, "app": cmd_app, "up": cmd_up, "status": cmd_status,
     "down": cmd_down,
 }
