@@ -1,20 +1,31 @@
 import { expect, test } from "bun:test";
-import { DEMO_BANNER_TEXT, DemoBanner } from "@crm/ui/components/demo-banner";
+import {
+	DEMO_BANNER_LINES,
+	DEMO_BANNER_TEXT,
+	DEMO_BANNER_TITLE,
+	DemoBanner,
+} from "@crm/ui/components/demo-banner";
 import { createElement } from "react";
 import { renderToStaticMarkup, renderToString } from "react-dom/server";
 
 test("tells visitors the demo is shared and not for real information", () => {
-	const markup = renderToStaticMarkup(createElement(DemoBanner));
-
-	expect(markup).toContain('role="note"');
 	expect(DEMO_BANNER_TEXT).toBe(
-		"Shared public demo · sample data only · everything you type is visible to other visitors · do not enter real information",
+		"Public demo Sample data, shared with every visitor. Anything you type is visible to others. Do not enter real information.",
 	);
-	expect(markup).toContain(DEMO_BANNER_TEXT);
+
+	for (const variant of ["strip", "card"] as const) {
+		const markup = renderToStaticMarkup(createElement(DemoBanner, { variant }));
+		expect(markup).toContain('role="note"');
+		expect(markup).toContain(`<strong`);
+		expect(markup).toContain(DEMO_BANNER_TITLE);
+		for (const line of DEMO_BANNER_LINES) expect(markup).toContain(line);
+	}
 });
 
 test("renders the same markup every time, so hydration cannot differ", () => {
-	expect(renderToString(createElement(DemoBanner))).toBe(
-		renderToString(createElement(DemoBanner)),
-	);
+	for (const variant of ["strip", "card"] as const) {
+		expect(renderToString(createElement(DemoBanner, { variant }))).toBe(
+			renderToString(createElement(DemoBanner, { variant })),
+		);
+	}
 });

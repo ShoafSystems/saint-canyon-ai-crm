@@ -77,23 +77,30 @@
 	--spacing: 0.25rem;
 }
 
+/*
+ * Dark is the glass theme: smoky charcoal/olive glass over a soft organic
+ * backdrop, lime accent. Surfaces are translucent tokens; the blur, edge
+ * highlight and depth come from the "Glass" section below, and fall back to
+ * opaque fills without backdrop-filter or with prefers-reduced-transparency.
+ */
 .dark {
-	--background: #0f0f0f;
-	--foreground: #f5f5f5;
-	--card: #171717;
-	--card-foreground: #f5f5f5;
-	--popover: #171717;
-	--popover-foreground: #f5f5f5;
-	--primary: #006b4f;
-	--primary-foreground: #ffffff;
-	--secondary: #1f1f1f;
-	--secondary-foreground: #f5f5f5;
-	--muted: #1f1f1f;
-	--muted-foreground: #a0a0a0;
-	--accent: #292929;
-	--accent-foreground: #f5f5f5;
-	--tag: #292929;
-	--tag-foreground: #f5f5f5;
+	color-scheme: dark;
+	--background: #0b0d0a;
+	--foreground: #f2f4ee;
+	--card: rgb(30 34 27 / 0.58);
+	--card-foreground: #f2f4ee;
+	--popover: rgb(24 27 21 / 0.8);
+	--popover-foreground: #f2f4ee;
+	--primary: #c5f04a;
+	--primary-foreground: #131807;
+	--secondary: rgb(255 255 255 / 0.08);
+	--secondary-foreground: #f2f4ee;
+	--muted: rgb(255 255 255 / 0.06);
+	--muted-foreground: #b4b9ab;
+	--accent: rgb(255 255 255 / 0.11);
+	--accent-foreground: #f2f4ee;
+	--tag: rgb(255 255 255 / 0.1);
+	--tag-foreground: #f2f4ee;
 	--destructive: #ae2e24;
 	--destructive-foreground: #ffffff;
 	--success: oklch(0.72 0.16 155);
@@ -102,11 +109,11 @@
 	--warning-foreground: oklch(0.205 0 0);
 	--info: oklch(0.7 0.15 250);
 	--info-foreground: oklch(0.205 0 0);
-	--border: #2a2a2a;
-	--input: #2a2a2a;
-	--overlay: rgb(0 0 0 / 0.55);
-	--ring: #40be96;
-	--chart-1: #0fa871;
+	--border: rgb(255 255 255 / 0.1);
+	--input: rgb(255 255 255 / 0.14);
+	--overlay: rgb(4 6 3 / 0.45);
+	--ring: #c5f04a;
+	--chart-1: #b6e03c;
 	--chart-2: #4b87f0;
 	--chart-3: #c07e22;
 	--chart-4: #9b7bf0;
@@ -120,31 +127,77 @@
 	--code-foreground: #e3e3e3;
 	--code-accent: #e5735b;
 	--code-string: #40be96;
-	--sidebar: #171717;
-	--sidebar-foreground: #f5f5f5;
-	--sidebar-primary: #006b4f;
-	--sidebar-primary-foreground: #ffffff;
-	--sidebar-accent: #292929;
-	--sidebar-accent-foreground: #f5f5f5;
-	--sidebar-border: #2a2a2a;
-	--sidebar-ring: #40be96;
-	--font-sans: var(--font-geist-sans, "Geist", sans-serif);
+	--sidebar: rgb(24 27 21 / 0.55);
+	--sidebar-foreground: #f2f4ee;
+	--sidebar-primary: #c5f04a;
+	--sidebar-primary-foreground: #131807;
+	--sidebar-accent: rgb(255 255 255 / 0.11);
+	--sidebar-accent-foreground: #f2f4ee;
+	--sidebar-border: rgb(255 255 255 / 0.1);
+	--sidebar-ring: #c5f04a;
+	/* SF on Apple platforms, Geist everywhere else. */
+	--font-sans:
+		-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+		var(--font-geist-sans, "Geist"), system-ui, sans-serif;
 	--font-mono: var(--font-geist-mono, "Geist Mono", monospace);
-	--radius: 5px;
+	--radius: 10px;
 	--shadow-x: 0px;
 	--shadow-y: 1px;
 	--shadow-blur: 2px;
 	--shadow-spread: 0px;
-	--shadow-opacity: 0.08;
+	--shadow-opacity: 0.2;
 	--shadow-color: hsl(0 0% 0%);
-	--shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.04);
-	--shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.04);
-	--shadow-sm: 0px 1px 2px 0px hsl(0 0% 0% / 0.06);
-	--shadow: 0px 1px 2px 0px hsl(0 0% 0% / 0.06);
-	--shadow-md: 0px 2px 4px -1px hsl(0 0% 0% / 0.08);
-	--shadow-lg: 0px 4px 8px -2px hsl(0 0% 0% / 0.08);
-	--shadow-xl: 0px 8px 16px -4px hsl(0 0% 0% / 0.08);
-	--shadow-2xl: 0px 16px 32px -8px hsl(0 0% 0% / 0.12);
+	--shadow-2xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.2);
+	--shadow-xs: 0px 1px 2px 0px hsl(0 0% 0% / 0.22);
+	--shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
+	--shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
+	--shadow-md: 0px 4px 12px -2px hsl(0 0% 0% / 0.35);
+	--shadow-lg: 0px 12px 32px -8px hsl(0 0% 0% / 0.5);
+	--shadow-xl: 0px 20px 48px -12px hsl(0 0% 0% / 0.55);
+	--shadow-2xl: 0px 28px 72px -16px hsl(0 0% 0% / 0.6);
+
+	/* Glass */
+	--glass-blur: blur(24px) saturate(170%);
+	--glass-blur-soft: blur(14px) saturate(150%);
+	--glass-edge: rgb(255 255 255 / 0.1);
+	--glass-highlight: inset 0 1px 0 0 rgb(255 255 255 / 0.07);
+	--glass-depth: 0 1px 2px rgb(0 0 0 / 0.22), 0 14px 36px -14px rgb(0 0 0 / 0.6);
+	--glass-float: 0 2px 8px rgb(0 0 0 / 0.3), 0 28px 64px -18px rgb(0 0 0 / 0.7);
+	--glass-chrome: rgb(14 16 12 / 0.55);
+	--glass-backdrop:
+		radial-gradient(48vmax 38vmax at 6% -6%, rgb(150 196 44 / 0.26), transparent 62%),
+		radial-gradient(42vmax 36vmax at 98% 4%, rgb(32 136 116 / 0.22), transparent 64%),
+		radial-gradient(52vmax 40vmax at 76% 104%, rgb(196 128 44 / 0.16), transparent 62%),
+		radial-gradient(40vmax 34vmax at 10% 100%, rgb(116 74 150 / 0.16), transparent 64%),
+		linear-gradient(160deg, #10130d 0%, #0b0d0a 55%, #0d0f0b 100%);
+}
+
+/*
+ * Without backdrop-filter, or when the visitor asks for less transparency,
+ * glass turns into opaque smoked fills with the same hue, so text never sits
+ * on an unblurred, busy backdrop.
+ */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+	.dark {
+		--card: #1b1e18;
+		--popover: #1d2019;
+		--sidebar: #161914;
+		--glass-chrome: #121410;
+		--glass-blur: none;
+		--glass-blur-soft: none;
+	}
+}
+
+@media (prefers-reduced-transparency: reduce) {
+	.dark {
+		--card: #1b1e18;
+		--popover: #1d2019;
+		--sidebar: #161914;
+		--glass-chrome: #121410;
+		--overlay: rgb(4 6 3 / 0.75);
+		--glass-blur: none;
+		--glass-blur-soft: none;
+	}
 }
 
 @theme inline {
@@ -219,10 +272,11 @@
 
 	--font-sans: var(--font-sans);
 	--font-mono: var(--font-mono);
-	--radius-sm: 4px;
+	/* 4 / 5 / 8 / 12px in light; the glass theme's larger --radius rounds them up. */
+	--radius-sm: calc(var(--radius) - 1px);
 	--radius-md: var(--radius);
-	--radius-lg: 8px;
-	--radius-xl: 12px;
+	--radius-lg: calc(var(--radius) + 3px);
+	--radius-xl: calc(var(--radius) + 7px);
 
 	--shadow-2xs: var(--shadow-2xs);
 	--shadow-xs: var(--shadow-xs);
@@ -268,6 +322,198 @@
 	}
 	*::-webkit-scrollbar-corner {
 		background: transparent;
+	}
+
+	.dark body,
+	.dark[data-slot="auth-shell"] {
+		background-color: var(--background);
+		background-image: var(--glass-backdrop);
+		background-attachment: fixed;
+	}
+}
+
+/*
+ * Glass. Colours come from the tokens above; these rules add the blur, the
+ * hairline edge, the top highlight and depth to the shared surfaces by their
+ * data-slot, so pages opt in by using the components rather than classes.
+ */
+@layer utilities {
+	/* Panels: cards, KPI strips, charts, tables, board columns. */
+	.dark
+		:is(
+			[data-slot="card-content"],
+			[data-slot="card-panel"],
+			[data-slot="stat-group"],
+			[data-slot="chart-card"],
+			[data-slot="kpi-card"],
+			[data-slot="table-container"].bg-card,
+			[data-slot="auth-card"]
+		) {
+		border-color: var(--glass-edge);
+		border-radius: var(--radius-xl);
+		background-color: var(--card);
+		box-shadow: var(--glass-highlight), var(--glass-depth);
+		-webkit-backdrop-filter: var(--glass-blur-soft);
+		backdrop-filter: var(--glass-blur-soft);
+	}
+
+	/* Floating layers: menus, popovers, tooltips, dialogs, sheets. */
+	.dark
+		:is(
+			[data-slot="dropdown-menu-content"],
+			[data-slot="dropdown-menu-sub-content"],
+			[data-slot="popover-content"],
+			[data-slot="select-content"],
+			[data-slot="dialog-content"],
+			[data-slot="alert-dialog-content"],
+			[data-slot="drawer-content"],
+			[data-slot="sheet-content"]
+		) {
+		background-color: var(--popover);
+		box-shadow: var(--glass-highlight), var(--glass-float);
+		-webkit-backdrop-filter: var(--glass-blur);
+		backdrop-filter: var(--glass-blur);
+	}
+	.dark
+		:is(
+			[data-slot="dropdown-menu-content"],
+			[data-slot="dropdown-menu-sub-content"],
+			[data-slot="popover-content"],
+			[data-slot="select-content"],
+			[data-slot="dialog-content"],
+			[data-slot="alert-dialog-content"]
+		) {
+		border-radius: var(--radius-xl);
+		--tw-ring-color: var(--glass-edge);
+	}
+	.dark [data-slot="dropdown-menu-item"],
+	.dark [data-slot="select-item"] {
+		border-radius: var(--radius-md);
+	}
+	.dark [data-slot="tooltip-content"] {
+		border-radius: 9999px;
+		box-shadow: var(--glass-float);
+	}
+	/* Record drawers float as a glass slab inset from the screen edge. */
+	@media (min-width: 640px) {
+		.dark [data-slot="sheet-content"][data-side="right"] {
+			inset-block: 10px;
+			right: 10px;
+			height: auto;
+			border: 1px solid var(--glass-edge);
+			border-radius: calc(var(--radius-xl) + 4px);
+			overflow: hidden;
+		}
+	}
+	.dark [data-slot="sheet-overlay"],
+	.dark [data-slot="dialog-overlay"],
+	.dark [data-slot="alert-dialog-overlay"],
+	.dark [data-slot="drawer-overlay"] {
+		-webkit-backdrop-filter: blur(6px) saturate(120%);
+		backdrop-filter: blur(6px) saturate(120%);
+	}
+
+	/* App chrome: a floating top bar and a pill icon rail. */
+	.dark [data-slot="app-header"] {
+		margin: 10px 12px 0;
+		border: 1px solid var(--glass-edge);
+		border-radius: 9999px;
+		padding-inline: 8px;
+		background-color: var(--glass-chrome);
+		box-shadow: var(--glass-highlight), var(--glass-depth);
+		-webkit-backdrop-filter: var(--glass-blur);
+		backdrop-filter: var(--glass-blur);
+	}
+	@media (min-width: 768px) {
+		.dark [data-slot="app-rail"] {
+			align-self: flex-start;
+			width: 56px;
+			margin: 16px 0 16px 12px;
+			gap: 6px;
+			border: 1px solid var(--glass-edge);
+			border-radius: 9999px;
+			padding-block: 8px;
+			background-color: var(--glass-chrome);
+			box-shadow: var(--glass-highlight), var(--glass-float);
+			-webkit-backdrop-filter: var(--glass-blur);
+			backdrop-filter: var(--glass-blur);
+		}
+	}
+	.dark [data-slot="app-rail"] [data-slot="button"] {
+		width: 40px;
+		height: 40px;
+		border-radius: 9999px;
+	}
+	.dark [data-slot="app-rail"] [aria-current="page"] {
+		background-color: var(--primary);
+		color: var(--primary-foreground);
+		box-shadow: 0 4px 14px -4px rgb(197 240 74 / 0.55);
+	}
+
+	/* Pill navigation: segmented tabs and toggle groups. */
+	.dark [data-slot="tabs-list"][data-variant="default"] {
+		height: 34px;
+		border: 1px solid var(--glass-edge);
+		border-radius: 9999px;
+		box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
+	}
+	.dark [data-slot="tabs-list"][data-variant="default"] [data-slot="tabs-trigger"] {
+		border-radius: 9999px;
+		padding-inline: 10px;
+	}
+	.dark [data-slot="toggle-group"][data-spacing="0"] {
+		border-radius: 9999px;
+	}
+	.dark [data-slot="toggle-group"][data-spacing="0"] > [data-slot="toggle-group-item"]:first-child {
+		border-start-start-radius: 9999px;
+		border-end-start-radius: 9999px;
+		padding-inline-start: 12px;
+	}
+	.dark [data-slot="toggle-group"][data-spacing="0"] > [data-slot="toggle-group-item"]:last-child {
+		border-start-end-radius: 9999px;
+		border-end-end-radius: 9999px;
+		padding-inline-end: 12px;
+	}
+	.dark [data-slot="toggle-group-item"][data-state="on"] {
+		border-color: var(--primary);
+		background-color: color-mix(in oklab, var(--primary) 16%, transparent);
+		color: var(--foreground);
+	}
+
+	/* Tables read as rows on glass; the sticky header stays legible. */
+	.dark [data-slot="table-container"] [data-slot="table-head"] {
+		background-color: rgb(26 30 23 / 0.9);
+	}
+	.dark [data-slot="table-row"]:hover {
+		background-color: rgb(255 255 255 / 0.05);
+	}
+
+	/* Deals board: glass columns holding lighter glass cards. */
+	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"] {
+		border-color: var(--glass-edge);
+		border-radius: var(--radius-lg);
+		background-color: rgb(255 255 255 / 0.06);
+		box-shadow: var(--glass-highlight);
+		transition:
+			background-color 160ms ease,
+			transform 160ms ease;
+	}
+	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"]:hover {
+		background-color: rgb(255 255 255 / 0.09);
+	}
+
+	/* Fields sit in the glass instead of punching dark holes in it. */
+	.dark :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]) {
+		background-color: rgb(255 255 255 / 0.05);
+	}
+}
+
+@media (prefers-reduced-transparency: reduce) {
+	.dark [data-slot="deals-board-column"] [data-slot="card-panel-detail"] {
+		background-color: #23271f;
+	}
+	.dark [data-slot="table-container"] [data-slot="table-head"] {
+		background-color: #1b1e18;
 	}
 }
 

@@ -48,10 +48,7 @@ export default function SignInPage({ searchParams }: PageProps<"/sign-in">) {
 		<AuthShell>
 			<Suspense
 				fallback={
-					<AuthHeading
-						title="Welcome back"
-						description="Sign in with your account to continue."
-					/>
+					<AuthHeading title="Sign in" description="Checking how you can sign in…" />
 				}
 			>
 				<SignIn searchParams={searchParams} />
@@ -107,16 +104,25 @@ async function SignIn({
 		);
 	}
 
+	const demoOnly = demo && !showSso && social.length === 0;
+
 	return (
 		<>
-			<AuthHeading
-				title="Welcome back"
-				description="Sign in with your account to continue."
-			/>
+			{demoOnly ? (
+				<AuthHeading
+					title="Explore the CRM demo"
+					description="Look around a working CRM filled with sample companies, contacts and deals."
+				/>
+			) : (
+				<AuthHeading
+					title="Welcome back"
+					description="Sign in with your account to continue."
+				/>
+			)}
 
 			{demo ? (
 				<>
-					<DemoBanner className="rounded-md border" />
+					<DemoBanner variant="card" />
 					<DemoSignIn action={DEMO_SIGN_IN_URL} />
 				</>
 			) : null}

@@ -1,14 +1,16 @@
 import Logo from "@crm/ui/components/logo";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { AuthShader } from "@/components/auth-shader";
 
+// The glass backdrop and the frosted card come from the theme
+// (data-slot="auth-shell" / "auth-card" in @crm/ui globals.css).
 export function AuthShell({ children }: { children: ReactNode }) {
 	return (
-		<main className="dark grid min-h-svh bg-background text-foreground lg:grid-cols-[minmax(0,1fr)_minmax(420px,520px)]">
-			<section className="relative hidden min-h-svh overflow-hidden bg-muted p-8 lg:flex lg:flex-col lg:justify-between xl:p-12">
-				<AuthShader />
-
+		<main
+			data-slot="auth-shell"
+			className="dark grid min-h-svh bg-background text-foreground lg:grid-cols-[minmax(0,1fr)_minmax(420px,560px)]"
+		>
+			<section className="relative hidden min-h-svh overflow-hidden p-8 lg:flex lg:flex-col lg:justify-between xl:p-12">
 				<div className="relative flex gap-2 text-sm/5">
 					<Link href="/" aria-label="Homepage" className="flex">
 						<Logo className="size-5 shrink-0" />
@@ -39,13 +41,14 @@ export function AuthShell({ children }: { children: ReactNode }) {
 				</p>
 			</section>
 
-			<section className="flex min-h-svh flex-col bg-background px-6 py-8 sm:px-10 lg:px-14">
-				<div className="flex gap-2 text-sm/5 max-lg:hidden lg:invisible">
-					<Logo className="size-5 shrink-0" />
-				</div>
-
-				<div className="flex flex-1 items-center justify-center py-12">
-					<div className="flex w-full max-w-sm flex-col gap-8">{children}</div>
+			<section className="flex min-h-svh flex-col px-4 py-8 sm:px-10 lg:px-14">
+				<div className="flex flex-1 items-center justify-center py-6">
+					<div
+						data-slot="auth-card"
+						className="flex w-full max-w-md flex-col gap-7 border p-6 sm:p-8"
+					>
+						{children}
+					</div>
 				</div>
 			</section>
 		</main>
@@ -68,7 +71,7 @@ export function AuthHeading({
 				<h2 className="text-2xl/8 font-semibold tracking-tight text-balance">
 					{title}
 				</h2>
-				<p className="max-w-[32ch] text-sm/5 text-muted-foreground text-pretty">
+				<p className="max-w-[34ch] text-sm/5 text-muted-foreground text-pretty">
 					{description}
 				</p>
 			</div>

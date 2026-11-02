@@ -28,7 +28,11 @@ function DemoDisabled({
   if (!active) return <>{children}</>
 
   const noteElement = (
-    <span id={noteId} className="text-xs text-muted-foreground">
+    <span
+      id={noteId}
+      data-slot="demo-disabled-note"
+      className="inline-flex shrink-0 items-center rounded-full border bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+    >
       {note}
     </span>
   )

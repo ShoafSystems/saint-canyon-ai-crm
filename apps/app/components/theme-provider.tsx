@@ -10,7 +10,8 @@ export function ThemeProvider({
 	return (
 		<NextThemesProvider
 			attribute="class"
-			defaultTheme="system"
+			// Dark is the glass theme; light stays one toggle away in the account menu.
+			defaultTheme="dark"
 			enableSystem
 			disableTransitionOnChange
 			{...props}

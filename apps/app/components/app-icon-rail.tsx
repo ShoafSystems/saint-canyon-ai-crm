@@ -187,6 +187,7 @@ function MobileRailIconLink({
 export function AppIconRailFallback() {
 	return (
 		<nav
+			data-slot="app-rail"
 			aria-label="Primary"
 			aria-busy="true"
 			className="hidden w-14 shrink-0 flex-col items-center gap-1 border-r py-3 md:flex [view-transition-name:app-rail]"
@@ -230,6 +231,7 @@ export function AppIconRail() {
 	return (
 		<>
 			<nav
+				data-slot="app-rail"
 				aria-label="Primary"
 				className="hidden w-14 shrink-0 flex-col items-center gap-1 border-r py-3 md:flex [view-transition-name:app-rail]"
 			>
