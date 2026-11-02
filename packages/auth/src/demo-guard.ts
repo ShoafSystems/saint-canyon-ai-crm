@@ -4,7 +4,7 @@ import {
 	createAuthMiddleware,
 	getSessionFromCtx,
 } from "better-auth/api";
-import { DEMO_DISABLED_MESSAGE, isDemoUser } from "./demo";
+import { DEMO_DISABLED_MESSAGE, isDemoAccount } from "./demo";
 
 // Every visitor shares the demo user, so anything that mints a credential,
 // links a personal account, shows or ends other visitors' sessions, or edits
@@ -45,7 +45,7 @@ export const demoGuard = () =>
 					matcher: (context) => isDemoBlockedAuthPath(context.path ?? ""),
 					handler: createAuthMiddleware(async (ctx) => {
 						const session = await getSessionFromCtx(ctx);
-						if (session && isDemoUser(session.user.email)) {
+						if (session && isDemoAccount(session.user.email)) {
 							throw new APIError("FORBIDDEN", {
 								message: DEMO_DISABLED_MESSAGE,
 							});

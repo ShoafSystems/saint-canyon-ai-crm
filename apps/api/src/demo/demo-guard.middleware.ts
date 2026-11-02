@@ -1,5 +1,5 @@
 import { API_KEY_HEADER } from "@crm/auth/api-keys";
-import { DEMO_DISABLED_MESSAGE, isDemoUser } from "@crm/auth/demo";
+import { DEMO_DISABLED_MESSAGE, isDemoAccount } from "@crm/auth/demo";
 import { Injectable } from "@nestjs/common";
 import { TRPCError } from "@trpc/server";
 import type {
@@ -16,7 +16,7 @@ import { isRefusedForDemo } from "./demo-policy";
 export class DemoGuardMiddleware implements TRPCMiddleware {
 	async use(opts: MiddlewareOptions): Promise<MiddlewareResponse> {
 		const ctx = opts.ctx as BaseTrpcContext;
-		if (!isDemoUser(ctx.session?.user.email)) return opts.next();
+		if (!isDemoAccount(ctx.session?.user.email)) return opts.next();
 
 		const refused = isRefusedForDemo({
 			path: opts.path,

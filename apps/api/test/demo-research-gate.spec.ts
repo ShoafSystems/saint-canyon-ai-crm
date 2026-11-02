@@ -17,7 +17,7 @@ fallback(
 fallback("BETTER_AUTH_SECRET", "test-secret-at-least-32-characters-long");
 fallback("API_URL", "http://localhost:3001");
 
-const { isDemoUser } = await import("@crm/auth/demo");
+const { isDemoAccount, isDemoUser } = await import("@crm/auth/demo");
 const { SettingsService } = await import("../src/settings/settings.service");
 
 const DEMO_EMAIL = "demo@demo.example";
@@ -59,6 +59,21 @@ describe("isDemoUser", () => {
 
 		process.env.DEMO_LOGIN_ENABLED = "false";
 		expect(isDemoUser(DEMO_EMAIL)).toBe(false);
+	});
+});
+
+describe("isDemoAccount", () => {
+	it("keeps matching the demo address after demo sign-in is switched off", () => {
+		expect(isDemoAccount(DEMO_EMAIL)).toBe(true);
+
+		process.env.DEMO_LOGIN_ENABLED = "false";
+		expect(isDemoAccount(" Demo@Demo.Example ")).toBe(true);
+		expect(isDemoAccount("rep@demo.example")).toBe(false);
+		expect(isDemoAccount(undefined)).toBe(false);
+
+		delete process.env.DEMO_LOGIN_EMAIL;
+		expect(isDemoAccount(DEMO_EMAIL)).toBe(false);
+		expect(isDemoAccount(undefined)).toBe(false);
 	});
 });
 

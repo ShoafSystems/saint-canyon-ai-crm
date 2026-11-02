@@ -341,6 +341,30 @@ describe("Better Auth endpoints the demo user may not call", () => {
 		expect(key.status).toBe(200);
 	});
 
+	it("keeps refusing a live demo session after demo sign-in is switched off", async () => {
+		process.env.DEMO_LOGIN_ENABLED = "false";
+		try {
+			const key = await authCall(demo, "post", "/api-key/create", {
+				name: "after disable",
+			});
+			expect(key.status).toBe(403);
+			expect(key.body.message).toBe(DISABLED);
+
+			const mutation = await trpcMutation(demo, "settings.setAgentModel", {
+				model: "anthropic/claude-opus-5-5",
+			});
+			expect(mutation.status).toBe(403);
+			expect(mutation.body.error.message).toBe(DISABLED);
+
+			const rest = await request(app.getHttpServer())
+				.get("/rest/users")
+				.set("Cookie", demo.cookie);
+			expect(rest.status).toBe(403);
+		} finally {
+			process.env.DEMO_LOGIN_ENABLED = "true";
+		}
+	});
+
 	it("leaves the demo user's name alone", async () => {
 		const user = await db.user.findUniqueOrThrow({
 			where: { email: DEMO_EMAIL },

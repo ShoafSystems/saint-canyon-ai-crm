@@ -36,6 +36,20 @@ export function isDemoUser(
 }
 
 /**
+ * The demo account for the guards: the configured address, whether or not
+ * demo sign-in is on. Switching the flag off must not turn a demo session
+ * that is still alive into an unrestricted member, so the guards keep
+ * refusing it until `disable-demo` has revoked it (deploy/forge).
+ */
+export function isDemoAccount(
+	email: string | null | undefined,
+	source: Source = process.env,
+): boolean {
+	const settings = readDemoLoginSettings(source);
+	return settings.email !== undefined && normalise(email) === settings.email;
+}
+
+/**
  * The demo address, when demo sign-in may be offered. A domain entry in
  * ALLOWED_SIGN_IN is not enough: the exact address has to be listed, so a
  * domain allow-list can never quietly turn the demo on.

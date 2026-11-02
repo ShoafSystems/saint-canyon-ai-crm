@@ -1,4 +1,4 @@
-import { DEMO_DISABLED_MESSAGE, isDemoUser } from "@crm/auth/demo";
+import { DEMO_DISABLED_MESSAGE, isDemoAccount } from "@crm/auth/demo";
 import { db } from "@crm/db";
 import { connection } from "next/server";
 import { z } from "zod";
@@ -44,7 +44,7 @@ async function handler(request: Request): Promise<Response> {
 
 	const session = await getSession();
 	if (!session) return failure("Not signed in.", 401);
-	if (isDemoUser(session.user.email)) {
+	if (isDemoAccount(session.user.email)) {
 		return failure(DEMO_DISABLED_MESSAGE, 403);
 	}
 
