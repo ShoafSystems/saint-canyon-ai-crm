@@ -1,7 +1,5 @@
 "use client";
 
-import ChevronLeft from "@carbon/icons-react/es/ChevronLeft";
-import ChevronRight from "@carbon/icons-react/es/ChevronRight";
 import type { DealStage } from "@crm/db/enums";
 import { Button } from "@crm/ui/components/button";
 import {
@@ -26,6 +24,7 @@ import {
 } from "@crm/ui/lib/format";
 import { cn } from "@crm/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useQueryStates } from "nuqs";
 import {
 	type DragEvent,
@@ -152,7 +151,7 @@ export function DealsBoard() {
 								aria-label="Earlier stages"
 								onClick={() => scroll.by(-1)}
 							>
-								<Icon icon={ChevronLeft} />
+								<Icon icon={ChevronLeftIcon} />
 							</Button>
 							<Button
 								variant="outline"
@@ -161,7 +160,7 @@ export function DealsBoard() {
 								aria-label="Later stages"
 								onClick={() => scroll.by(1)}
 							>
-								<Icon icon={ChevronRight} />
+								<Icon icon={ChevronRightIcon} />
 							</Button>
 						</div>
 					) : null}
@@ -372,7 +371,7 @@ function DealCard({
 							aria-label={`Move to ${LABELS.get(previous)}`}
 							onClick={() => onMove(previous)}
 						>
-							<Icon icon={ChevronLeft} />
+							<Icon icon={ChevronLeftIcon} />
 						</Button>
 					)}
 					{next === null ? null : (
@@ -383,7 +382,7 @@ function DealCard({
 							aria-label={`Move to ${LABELS.get(next)}`}
 							onClick={() => onMove(next)}
 						>
-							<Icon icon={ChevronRight} />
+							<Icon icon={ChevronRightIcon} />
 						</Button>
 					)}
 				</span>
