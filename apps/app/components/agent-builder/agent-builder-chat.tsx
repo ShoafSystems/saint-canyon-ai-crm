@@ -1,20 +1,5 @@
 "use client";
 
-import Add from "@carbon/icons-react/es/Add";
-import Application from "@carbon/icons-react/es/Application";
-import ArrowRight from "@carbon/icons-react/es/ArrowRight";
-import Building from "@carbon/icons-react/es/Building";
-import Checkmark from "@carbon/icons-react/es/Checkmark";
-import Copy from "@carbon/icons-react/es/Copy";
-import Partnership from "@carbon/icons-react/es/Partnership";
-import Play from "@carbon/icons-react/es/Play";
-import Renew from "@carbon/icons-react/es/Renew";
-import Reply from "@carbon/icons-react/es/Reply";
-import Security from "@carbon/icons-react/es/Security";
-import ThumbsDown from "@carbon/icons-react/es/ThumbsDown";
-import ThumbsUp from "@carbon/icons-react/es/ThumbsUp";
-import User from "@carbon/icons-react/es/User";
-import WarningAlt from "@carbon/icons-react/es/WarningAlt";
 import {
 	AsyncButtonContent,
 	useAsyncAction,
@@ -35,7 +20,6 @@ import {
 import { Icon } from "@crm/ui/components/icon";
 import { Markdown } from "@crm/ui/components/markdown";
 import { ProviderMark } from "@crm/ui/components/provider-mark";
-import { Reasoning } from "@crm/ui/components/reasoning";
 import { ThinkingIndicator } from "@crm/ui/components/thinking-indicator";
 import { ToolStep } from "@crm/ui/components/tool-step";
 import type { ProviderBrand } from "@crm/ui/lib/provider-brand";
@@ -49,6 +33,23 @@ import {
 	type UseEveAgentStatus,
 	useEveAgent,
 } from "eve/react";
+import {
+	AppWindowIcon,
+	ArrowRightIcon,
+	Building2Icon,
+	CheckIcon,
+	CopyIcon,
+	HandshakeIcon,
+	PlayIcon,
+	PlusIcon,
+	RefreshCwIcon,
+	ReplyIcon,
+	ShieldIcon,
+	ThumbsDownIcon,
+	ThumbsUpIcon,
+	TriangleAlertIcon,
+	UserIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { Fragment, type ReactNode, useState } from "react";
 import { toast } from "sonner";
@@ -315,6 +316,24 @@ export function AgentBuilderChat({
 			onError: (error) => toast.error(error.message),
 		}),
 	);
+	const answerSessionLimit = useMutation(
+		trpc.conversations.answerBuilderSessionLimit.mutationOptions({
+			onSuccess: async () => {
+				await Promise.all([
+					queryClient.invalidateQueries({
+						queryKey: trpc.conversations.builderById.pathKey(),
+					}),
+					queryClient.invalidateQueries({
+						queryKey: trpc.conversations.builderList.pathKey(),
+					}),
+					queryClient.invalidateQueries({
+						queryKey: trpc.conversations.events.pathKey(),
+					}),
+				]);
+			},
+			onError: (error) => toast.error(error.message),
+		}),
+	);
 	const setPermissionMode = useMutation(
 		trpc.conversations.setBuilderPermissionMode.mutationOptions({
 			onSuccess: () =>
@@ -402,6 +421,12 @@ export function AgentBuilderChat({
 		waitingApproval &&
 		!hasQueuedInputResponse(submissions, waitingApproval.requestId)
 			? waitingApproval
+			: null;
+	const waitingSessionLimit = data.pendingSessionLimit;
+	const sessionLimit =
+		waitingSessionLimit &&
+		!hasQueuedInputResponse(submissions, waitingSessionLimit.requestId)
+			? waitingSessionLimit
 			: null;
 	const failure = latestTurnFailure(transcriptEvents);
 	const creatingAgent = hasCreateAgentCommand(submissions);
@@ -568,6 +593,25 @@ export function AgentBuilderChat({
 										id: conversationId,
 										clientRequestId: crypto.randomUUID(),
 										requestId: approval.requestId,
+										decision,
+									})
+								}
+							/>
+						</ChatThreadItem>
+					) : null}
+					{sessionLimit ? (
+						<ChatThreadItem
+							id={`session-limit:${sessionLimit.requestId}`}
+							scrollAnchor
+						>
+							<AgentSessionLimitCard
+								request={sessionLimit}
+								pending={answerSessionLimit.isPending}
+								onDecision={(decision) =>
+									answerSessionLimit.mutate({
+										id: conversationId,
+										clientRequestId: crypto.randomUUID(),
+										requestId: sessionLimit.requestId,
 										decision,
 									})
 								}
@@ -893,7 +937,7 @@ function ChatHeader({
 				{working ? (
 					<span className="flex shrink-0 items-center gap-2 text-muted-foreground text-xs">
 						<Icon
-							icon={Renew}
+							icon={RefreshCwIcon}
 							className="size-3.5 animate-spin text-ring"
 							motion="none"
 						/>
@@ -906,7 +950,7 @@ function ChatHeader({
 			</div>
 			<Button asChild variant="ghost" size="icon-sm">
 				<Link href={workspaceUrl("/chat")} aria-label="Start a new chat">
-					<Icon icon={Add} />
+					<Icon icon={PlusIcon} />
 				</Link>
 			</Button>
 			<ShareChatDialog conversationId={conversation.id} title={title} />
@@ -973,13 +1017,13 @@ function UserSubmission({
 			>
 				{response ? (
 					<div className="flex items-center gap-1.5 text-muted-foreground text-xs">
-						<Icon icon={Reply} className="size-3.5" />
+						<Icon icon={ReplyIcon} className="size-3.5" />
 						<span>Answer to follow-up</span>
 					</div>
 				) : null}
 				{submission.commandType === "CREATE_AGENT" ? (
 					<div className="flex flex-wrap gap-1">
-						<ChatCommandChip label="Create agent" icon={Application} />
+						<ChatCommandChip label="Create agent" icon={AppWindowIcon} />
 					</div>
 				) : null}
 				<p className="wrap-break-word">{text}</p>
@@ -1037,16 +1081,17 @@ function AssistantMessage({
 		<ChatMessage author="assistant">
 			{transcript.items.map((item) => {
 				if (item.kind === "reasoned") {
+					if (!item.streaming) return null;
+
 					return (
-						<Reasoning
+						<div
 							key={item.id}
-							isStreaming={item.streaming}
-							label="Reasoning"
+							role="status"
+							className="flex items-center gap-2 text-muted-foreground text-sm"
 						>
-							<Markdown className="wrap-break-word leading-5">
-								{displayMarkdown(item.text)}
-							</Markdown>
-						</Reasoning>
+							<ThinkingIndicator />
+							<span>Thinking…</span>
+						</div>
 					);
 				}
 
@@ -1124,6 +1169,7 @@ function FollowUpTranscriptItem({
 
 type PermissionMode = Conversation["permissionMode"];
 type ToolApproval = NonNullable<Conversation["pendingApproval"]>;
+type SessionLimit = NonNullable<Conversation["pendingSessionLimit"]>;
 
 const PERMISSION_MODES: ReadonlyArray<{
 	value: PermissionMode;
@@ -1167,7 +1213,7 @@ function PermissionModeMenu({
 					disabled={pending}
 					aria-label={`Permission mode: ${selected?.label ?? "Manual"}`}
 				>
-					<Icon icon={Security} data-icon="inline-start" />
+					<Icon icon={ShieldIcon} data-icon="inline-start" />
 					{selected?.label ?? "Manual"}
 				</Button>
 			</DropdownMenuTrigger>
@@ -1246,6 +1292,42 @@ function AgentApprovalCard({
 	);
 }
 
+function AgentSessionLimitCard({
+	request,
+	pending,
+	onDecision,
+}: {
+	request: SessionLimit;
+	pending: boolean;
+	onDecision: (decision: "continue" | "stop") => void;
+}) {
+	return (
+		<fieldset
+			disabled={pending}
+			className="w-full max-w-lg overflow-hidden rounded-lg border bg-card"
+		>
+			<legend className="sr-only">Session limit reached</legend>
+			<div className="p-4">
+				<p className="font-medium text-sm">Session limit reached</p>
+				<p className="mt-2 text-pretty text-sm leading-5">{request.prompt}</p>
+			</div>
+			<div className="flex items-center justify-end gap-2 border-t bg-muted px-4 py-3">
+				<Button
+					type="button"
+					variant="outline"
+					size="sm"
+					onClick={() => onDecision("stop")}
+				>
+					Stop
+				</Button>
+				<Button type="button" size="sm" onClick={() => onDecision("continue")}>
+					{pending ? "Continuing" : "Continue"}
+				</Button>
+			</div>
+		</fieldset>
+	);
+}
+
 function CopyResponseAction({ markdown }: { markdown: string }) {
 	return (
 		<div className="flex h-7 items-center">
@@ -1258,7 +1340,7 @@ function CopyResponseAction({ markdown }: { markdown: string }) {
 					toast.success("Response copied as Markdown.");
 				}}
 			>
-				<Icon icon={Copy} />
+				<Icon icon={CopyIcon} />
 			</Button>
 		</div>
 	);
@@ -1301,7 +1383,7 @@ function ResponseActions({
 					toast.success("Response copied as Markdown.");
 				}}
 			>
-				<Icon icon={Copy} />
+				<Icon icon={CopyIcon} />
 			</Button>
 			<Button
 				variant="ghost"
@@ -1311,7 +1393,7 @@ function ResponseActions({
 				className={cn(rating === "UP" && "bg-muted text-foreground")}
 				onClick={() => choose("UP")}
 			>
-				<Icon icon={ThumbsUp} />
+				<Icon icon={ThumbsUpIcon} />
 			</Button>
 			<Button
 				variant="ghost"
@@ -1321,7 +1403,7 @@ function ResponseActions({
 				className={cn(rating === "DOWN" && "bg-muted text-foreground")}
 				onClick={() => choose("DOWN")}
 			>
-				<Icon icon={ThumbsDown} />
+				<Icon icon={ThumbsDownIcon} />
 			</Button>
 		</div>
 	);
@@ -1377,7 +1459,7 @@ function BuildingAgentCard({
 										)}
 									>
 										{done ? (
-											<Icon icon={Checkmark} className="size-3.5" />
+											<Icon icon={CheckIcon} className="size-3.5" />
 										) : active ? (
 											<DotMatrix decorative />
 										) : (
@@ -1582,7 +1664,10 @@ function BuilderFailureCard({
 			className="flex flex-col items-stretch gap-3 rounded-lg border border-destructive/30 bg-card px-4 py-3 sm:flex-row sm:items-start"
 		>
 			<div className="flex min-w-0 flex-1 items-start gap-3">
-				<Icon icon={WarningAlt} className="mt-0.5 size-4 text-destructive" />
+				<Icon
+					icon={TriangleAlertIcon}
+					className="mt-0.5 size-4 text-destructive"
+				/>
 				<div className="min-w-0 flex-1">
 					<p className="font-medium text-sm">
 						{creatingAgent ? "Agent creation stopped" : "Response stopped"}
@@ -1645,14 +1730,14 @@ function ReviewAgentCard({
 						/>
 					</ReviewRow>
 				</div>
-				<AgentCardFooter note="Sandboxed · credentials never enter the sandbox">
+				<AgentCardFooter note="Runs in a sandbox. Credentials never enter it.">
 					<Button asChild size="sm">
 						<Link
 							href={workspaceUrl(`/agents/${agent.id}`)}
 							transitionTypes={["nav-forward"]}
 						>
 							View details
-							<Icon icon={ArrowRight} data-icon="inline-end" />
+							<Icon icon={ArrowRightIcon} data-icon="inline-end" />
 						</Link>
 					</Button>
 				</AgentCardFooter>
@@ -1754,7 +1839,7 @@ function DeployedAgentCard({
 	const nextRun =
 		enabledTriggers.length === 1 ? enabledTriggers[0]?.nextRunAt : null;
 	const triggerSummary =
-		enabledTriggers.map((trigger) => trigger.name).join(" · ") || "Manual only";
+		enabledTriggers.map((trigger) => trigger.name).join(", ") || "Manual only";
 
 	return (
 		<div className="flex flex-col gap-[18px]">
@@ -1785,8 +1870,9 @@ function DeployedAgentCard({
 							)
 						}
 					/>
-					<ReviewRow label="Runs in" value="Eve runtime · isolated sandbox" />
-					<ReviewRow label="Owner" value={`Team · ${agent.createdBy.name}`} />
+					<ReviewRow label="Runs in" value="Isolated Eve sandbox" />
+					<ReviewRow label="Visibility" value="Team" />
+					<ReviewRow label="Owner" value={agent.createdBy.name} />
 				</div>
 				<AgentCardFooter note="The chat stays private. The agent is team-owned.">
 					<div className="flex items-center gap-2">
@@ -1803,14 +1889,14 @@ function DeployedAgentCard({
 								successLabel="Queued"
 								errorLabel="Try again"
 							>
-								<Icon icon={Play} data-icon="inline-start" />
+								<Icon icon={PlayIcon} data-icon="inline-start" />
 								Run now
 							</AsyncButtonContent>
 						</Button>
 						<Button asChild size="sm">
 							<Link href={workspaceUrl(`/agents/${agent.id}`)}>
 								Open agent
-								<Icon icon={ArrowRight} data-icon="inline-end" />
+								<Icon icon={ArrowRightIcon} data-icon="inline-end" />
 							</Link>
 						</Button>
 					</div>
@@ -1831,7 +1917,10 @@ function DeployedAgentCard({
 						<span className="min-w-0 flex-1 wrap-break-word text-sm">
 							{suggestion}
 						</span>
-						<Icon icon={ArrowRight} className="size-4 text-muted-foreground" />
+						<Icon
+							icon={ArrowRightIcon}
+							className="size-4 text-muted-foreground"
+						/>
 					</button>
 				))}
 			</div>
@@ -1858,10 +1947,10 @@ function ChatUnavailable() {
 }
 
 const RESOURCE_ICONS = {
-	integration: Application,
-	company: Building,
-	contact: User,
-	deal: Partnership,
+	integration: AppWindowIcon,
+	company: Building2Icon,
+	contact: UserIcon,
+	deal: HandshakeIcon,
 } as const;
 
 function hasQueuedInputResponse(
@@ -1938,7 +2027,7 @@ function manifestOf(manifest: AgentManifestSummary) {
 								trigger.type === "EVENT" ? "On CRM event" : "On schedule",
 							),
 				)
-				.join(" · ") || "On demand",
+				.join(", ") || "On demand",
 		looksAt: textOf(
 			manifest.dataScope.summary,
 			"CRM records in the approved scope",

@@ -90,7 +90,7 @@ export function fromDay(value: string | null | undefined): Date | undefined {
 
 export function formatDay(value: string | null | undefined): string {
 	const date = fromDay(value);
-	return date ? dayFormat.format(date) : (value ?? "—");
+	return date ? dayFormat.format(date) : (value ?? "");
 }
 
 export function initialsFromName(name: string | null | undefined): string {

@@ -1,4 +1,4 @@
-import { Spinner } from "@crm/ui/components/spinner";
+import { PageShell, PageShellFallback } from "@crm/ui/components/page-shell";
 import { cn } from "@crm/ui/lib/utils";
 import { DemoGate } from "@/components/demo-gate";
 
@@ -12,32 +12,24 @@ export function ConnectionPage({
 	children: React.ReactNode;
 }) {
 	return (
-		<main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto px-(--spacing-page-inline) pt-(--spacing-page-top) pb-(--spacing-page-bottom)">
+		<PageShell
+			width="narrow"
+			className={cn(centered && "justify-center", className)}
+		>
+			{/* Inactive, the gate renders the children straight into the shell. */}
 			<DemoGate
 				noteFirst
 				className={cn(
-					"mx-auto w-full max-w-(--container-page) flex-col items-stretch",
-					centered && "flex-1",
+					"w-full flex-col items-stretch gap-6",
+					centered && "flex-1 justify-center",
 				)}
 			>
-				<div
-					className={cn(
-						"mx-auto flex w-full max-w-(--container-page) flex-col gap-(--spacing-page-gap)",
-						centered && "flex-1 justify-center",
-						className,
-					)}
-				>
-					{children}
-				</div>
+				{children}
 			</DemoGate>
-		</main>
+		</PageShell>
 	);
 }
 
 export function ConnectionPageLoading() {
-	return (
-		<main className="flex min-h-0 min-w-0 flex-1 items-center justify-center">
-			<Spinner size="lg" />
-		</main>
-	);
+	return <PageShellFallback width="narrow" shape="settings" />;
 }

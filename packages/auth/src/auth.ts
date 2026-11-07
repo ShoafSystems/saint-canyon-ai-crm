@@ -22,9 +22,11 @@ import {
 import { notifySignedIn } from "./signed-in";
 import { slackConnectGuard } from "./slack-connect";
 import { rememberSlackInstall, replaceSlackConnection } from "./slack-grant";
+import { slackOAuthCallback } from "./slack-oauth-callback";
 import { SLACK_REQUESTED_SCOPES, SLACK_USER_SCOPES } from "./slack-scopes";
 import { queueSlackInventorySync } from "./slack-sync";
 import {
+	googleHostedDomainHint,
 	hasSignInAllowList,
 	isWorkspaceEmail,
 	primaryWorkspaceDomain,
@@ -46,7 +48,7 @@ if (env.google) {
 		accessType: "offline",
 	};
 
-	const hostedDomain = primaryWorkspaceDomain();
+	const hostedDomain = googleHostedDomainHint();
 	if (hostedDomain) google.hd = hostedDomain;
 
 	socialProviders.google = google;
@@ -209,6 +211,7 @@ export const auth = betterAuth({
 							},
 						],
 					}),
+					slackOAuthCallback,
 				]
 			: []),
 		organization({

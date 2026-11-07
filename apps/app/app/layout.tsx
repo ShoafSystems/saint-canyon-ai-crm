@@ -1,10 +1,11 @@
 import "@crm/ui/globals.css";
-import { Toaster } from "@crm/ui/components/sonner";
 import { TooltipProvider } from "@crm/ui/components/tooltip";
 import { cn } from "@crm/ui/lib/utils";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Suspense } from "react";
+import { AppToaster } from "@/components/app-toaster";
 import { LocalDateTimeHydrator } from "@/components/local-date-time";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TRPCReactProvider } from "@/lib/trpc/client";
@@ -26,7 +27,7 @@ const fontMono = localFont({
 export const metadata: Metadata = {
 	title: {
 		default: "Comp AI - CRM",
-		template: "%s · Comp AI CRM",
+		template: "Comp AI CRM: %s",
 	},
 	description: "Customer Relationship Management for Comp AI",
 	icons: {
@@ -55,7 +56,9 @@ export default function RootLayout({
 					<TRPCReactProvider>
 						<ThemeProvider>
 							<TooltipProvider>{children}</TooltipProvider>
-							<Toaster richColors />
+							<Suspense>
+								<AppToaster />
+							</Suspense>
 						</ThemeProvider>
 					</TRPCReactProvider>
 				</NuqsAdapter>
