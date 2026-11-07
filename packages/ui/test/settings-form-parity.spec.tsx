@@ -62,6 +62,7 @@ if (process.env.CRM_SETTINGS_FORM_TEST_CHILD !== "1") {
 	}));
 	mock.module("../../../apps/app/lib/trpc/client", () => ({
 		useTRPC: () => ({
+			users: { me: { queryOptions: () => ({}) } },
 			sso: {
 				settings: { queryOptions: () => ({}) },
 				register: { mutationOptions: () => ({}) },
