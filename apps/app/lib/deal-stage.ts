@@ -1,6 +1,10 @@
 import { DealStage } from "@crm/db/enums";
 import type { StatusTone } from "@crm/ui/components/status-indicator";
-import { type ChartColor, stageChartColor } from "@crm/ui/lib/chart-config";
+import {
+	type ChartColor,
+	chartSwatch,
+	stageChartColor,
+} from "@crm/ui/lib/chart-config";
 
 const ORDER = [
 	DealStage.DEMO_BOOKED,
@@ -45,6 +49,11 @@ export function isClosedStage(stage: DealStage): boolean {
 
 export function dealStageChartColor(stage: DealStage): ChartColor {
 	return stageChartColor(OPEN_STAGES.indexOf(stage));
+}
+
+/** The same stage colour as the charts, as a CSS colour for markup. */
+export function dealStageColor(stage: DealStage): string {
+	return chartSwatch(dealStageChartColor(stage));
 }
 
 export function dealStageLabel(stage: DealStage): string {
