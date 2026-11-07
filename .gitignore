@@ -50,3 +50,11 @@ yarn-error.log*
 
 # Agent scratch files
 .scratch/
+.qa/
+
+# Deploy secrets/state. deploy/forge keeps these under ~/.local/share, but never
+# let a local copy land in the repo.
+deploy/**/env/
+deploy/**/state/
+deploy/**/*.env
+test-logins.json
